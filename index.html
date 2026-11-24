@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>C.A.M. Energy Facility</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one-screen industrial control console; menu screens centered, game = HUD bar + work area + side column (map, log). Deliberately single dark theme. */
+:root{
+  --bg:#0a0f13; --panel:#111a21; --panel2:#17232c; --line:#26343f; --fg:#d9e4ea; --dim:#7f939f;
+  --cyan:#4fd8ff; --amber:#ffb547; --red:#ff4d4d; --green:#5fe39a; --coin:#4d9fff;
+  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;box-sizing:border-box;overflow-x:hidden}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.02em}
+.screen{max-width:1180px;margin:0 auto}
+.coinbadge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-weight:600;color:var(--coin)}
+.coinbadge i{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bfe0ff,var(--coin) 55%,#1d4fa8);box-shadow:0 0 8px #4d9fff88;display:inline-block}
+
+/* ---------- menu ---------- */
+#menu{min-height:calc(100% - 4px);display:grid;place-items:center}
+.menu-card{width:min(440px,100%);display:flex;flex-direction:column;gap:22px;align-items:stretch;padding-block:24px}
+.logo{display:flex;gap:18px;align-items:center}
+.logo-ring{width:76px;height:76px;flex:none;border-radius:50%;border:2px solid var(--cyan);position:relative;box-shadow:0 0 24px #4fd8ff44 inset,0 0 18px #4fd8ff33}
+.logo-ring::before{content:"";position:absolute;inset:18px;border-radius:50%;background:radial-gradient(circle,#e8f8ff,#3d8bff 60%,transparent 72%);animation:pulse 2.4s ease-in-out infinite}
+.logo-ring::after{content:"";position:absolute;inset:6px;border-radius:50%;border:2px dashed #4fd8ff77;animation:spin 14s linear infinite}
+@keyframes pulse{50%{transform:scale(.86);opacity:.8}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo h1{font-size:44px;line-height:1;letter-spacing:.12em}
+.logo p{margin:4px 0 0;color:var(--dim);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.menu-list{display:flex;flex-direction:column;gap:8px}
+.mbtn{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);padding:12px 16px;text-align:left;font-family:var(--display);font-size:18px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;transition:border-color .15s,background .15s,transform .1s}
+.mbtn:hover{border-left-color:var(--cyan);background:var(--panel2)}
+.mbtn:active{transform:translateX(2px)}
+.mbtn.primary{border-left-color:var(--cyan)}
+.mbtn small{font-family:var(--mono);font-size:12px;color:var(--dim);text-transform:none;letter-spacing:0;font-weight:400}
+.menu-foot{display:flex;justify-content:space-between;color:var(--dim);font-size:12px;font-family:var(--mono)}
+
+/* ---------- sub pages ---------- */
+.page{display:flex;flex-direction:column;gap:18px;padding-block:8px 24px}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
+.page-head h2{font-size:28px;text-transform:uppercase;letter-spacing:.08em}
+.back{background:none;border:1px solid var(--line);padding:8px 14px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em}
+.back:hover{border-color:var(--cyan)}
+.set-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.set-row label{font-weight:500}
+.set-row p{margin:2px 0 0;color:var(--dim);font-size:13px}
+.toggle{min-width:84px;padding:8px 12px;border:1px solid var(--line);background:var(--panel);font-family:var(--mono);font-weight:600}
+.toggle[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
+input[type=range]{width:180px;accent-color:var(--cyan)}
+.danger{border:1px solid #ff4d4d88;background:#2a1215;color:#ffb3b3;padding:8px 14px}
+.danger.armed{background:var(--red);color:#1a0505;font-weight:600}
+.shop-cat h3{font-size:15px;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);margin-bottom:10px}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.item{background:var(--panel);border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px}
+.item.equipped{border-color:var(--cyan)}
+.swatches{display:flex;gap:6px;height:22px}
+.swatches span{flex:1;border-radius:3px}
+.item h4{margin:0;font-family:var(--display);font-size:17px}
+.item p{margin:0;color:var(--dim);font-size:13px;min-height:2.6em}
+.item button{padding:8px;border:1px solid var(--line);background:var(--panel2);font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.item button.buy{border-color:var(--coin);color:var(--coin)}
+.item button:disabled{opacity:.5;cursor:default}
+.empty{border:1px dashed var(--line);padding:48px 20px;text-align:center;color:var(--dim)}
+.empty strong{display:block;font-family:var(--display);font-size:20px;color:var(--fg);margin-bottom:6px}
+.credits{display:grid;gap:14px;max-width:560px}
+.credits div{display:grid;grid-template-columns:180px 1fr;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.credits dt{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.1em}
+.credits dd{margin:0}
+#exit,#result{min-height:calc(100% - 4px);display:grid;place-items:center;text-align:center}
+.end-card{display:flex;flex-direction:column;gap:14px;align-items:center;max-width:520px;padding-block:24px}
+.end-card h2{font-size:34px;text-transform:uppercase;letter-spacing:.08em}
+.end-card p{color:var(--dim);margin:0}
+.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:6px}
+.end-stats div{background:var(--panel);border:1px solid var(--line);padding:10px}
+.end-stats b{display:block;font-family:var(--mono);font-size:20px}
+.end-stats span{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- game ---------- */
+#game{display:flex;flex-direction:column;gap:12px}
+.hud{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:8px 12px}
+.hud .hgrp{display:flex;flex-direction:column;min-width:0}
+.hud .hl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.hud .hv{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hud .spacer{flex:1}
+.pill{font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border:1px solid currentColor;letter-spacing:.06em}
+.st-off{color:var(--dim)} .st-on{color:var(--green)} .st-warn{color:var(--amber)} .st-melt{color:var(--red)} .st-shut{color:var(--amber)}
+.hud-menu{background:none;border:1px solid var(--line);padding:6px 12px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em}
+.melt-banner{background:repeating-linear-gradient(135deg,#3a0b0d 0 18px,#250709 18px 36px);border:1px solid var(--red);padding:10px 14px;display:flex;gap:12px 20px;align-items:center;flex-wrap:wrap}
+.melt-banner b{font-family:var(--display);font-size:22px;color:#ffd0d0;letter-spacing:.06em}
+.melt-banner .count{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--red);font-variant-numeric:tabular-nums}
+.melt-banner p{margin:0;color:#ffc9c9;flex:1;min-width:200px}
+.game-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
+@media (max-width:900px){.game-grid{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--panel);border:1px solid var(--line);padding:14px}
+.sec-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.sec-head h2{font-size:26px;text-transform:uppercase;letter-spacing:.06em}
+.sec-tag{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.sec-desc{color:var(--dim);margin:6px 0 14px;max-width:65ch}
+.routes{display:flex;flex-wrap:wrap;gap:8px}
+.route{background:var(--panel2);border:1px solid var(--line);padding:10px 14px;font-family:var(--display);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.route:hover{border-color:var(--cyan)}
+.route.up{border-color:#5fe39a77}
+.route.collapsed{border-style:dashed;color:var(--red);border-color:#ff4d4d77;cursor:not-allowed}
+.travel{margin-top:4px}
+.travel .bar{height:10px;background:var(--panel2);border:1px solid var(--line);margin-top:6px;overflow:hidden}
+.travel .bar i{display:block;height:100%;background:var(--cyan);width:0}
+.sec-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.act{background:none;border:1px solid var(--line);padding:9px 14px}
+.act:hover{border-color:var(--amber)}
+.act:disabled{opacity:.45;cursor:default}
+.subh{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:16px 0 8px;font-family:var(--body);font-weight:600}
+
+/* control room */
+.cr{display:grid;gap:12px;margin-top:14px}
+.chamber-wrap{position:relative;border:1px solid var(--line);background:#05080b}
+#chamber{display:block;width:100%;height:auto;aspect-ratio:720/440}
+.gauges{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.gauges{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gauge{background:var(--panel2);border:1px solid var(--line);padding:8px 10px}
+.gauge .gl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.gauge .gv{font-family:var(--mono);font-weight:600;font-size:17px;font-variant-numeric:tabular-nums}
+.gauge .gb{height:6px;background:#0a1116;margin-top:6px}
+.gauge .gb i{display:block;height:100%;width:0;background:var(--cyan);transition:width .2s}
+.panel{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;background:#0d1419;border:1px solid var(--line);padding:10px}
+.pbtn{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;padding:10px 12px;background:linear-gradient(#1c2933,#141e26);border:1px solid #2e3f4b;border-bottom-width:3px;min-height:62px}
+.pbtn:hover{border-color:#4a6272}
+.pbtn:active{transform:translateY(2px);border-bottom-width:1px;margin-top:2px}
+.pbtn .lamp{grid-row:1 / span 2;width:14px;height:14px;border-radius:50%;background:#2a333a;box-shadow:inset 0 1px 2px #000}
+.pbtn.lit .lamp{background:var(--lampc,var(--green));box-shadow:0 0 10px var(--lampc,var(--green))}
+.pbtn .pl{font-family:var(--display);font-weight:600;font-size:14px;line-height:1.15;letter-spacing:.03em;text-transform:uppercase}
+.pbtn .ps{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.pbtn.blocked{opacity:.55}
+.pbtn.emerg{background:repeating-linear-gradient(135deg,#2a1d06 0 10px,#1a1205 10px 20px);border-color:#a06a10}
+.pbtn.emerg .lamp{background:#5a1010}
+.pbtn.emerg .pl{color:#ffb3a8}
+.pbtn.emerg.lit .lamp{--lampc:var(--red)}
+.checklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 12px;margin:0;padding:0;list-style:none;font-size:13px}
+.checklist li{display:flex;gap:8px;align-items:center;color:var(--dim)}
+.checklist li::before{content:"";width:10px;height:10px;border:1px solid var(--dim);flex:none}
+.checklist li.ok{color:var(--fg)}
+.checklist li.ok::before{background:var(--green);border-color:var(--green)}
+
+/* side */
+.side{display:flex;flex-direction:column;gap:12px}
+#map{width:100%;height:auto;display:block}
+#map .edge{stroke:#2f414d;stroke-width:3}
+#map .edge.hot{stroke:#ff4d4d}
+#map .node rect{fill:#17232c;stroke:#38505f;stroke-width:1.5}
+#map .node text{fill:var(--fg);font-family:var(--mono);font-size:11px;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+#map .node.adj{cursor:pointer}
+#map .node.adj rect{stroke:var(--cyan)}
+#map .node.here rect{fill:#0f3a4a;stroke:var(--cyan);stroke-width:2.5}
+#map .node.surf rect{stroke:var(--green)}
+#map .node.col rect{stroke:var(--red);stroke-dasharray:4 3;fill:#2a1215}
+#map .you{fill:var(--cyan)}
+.log{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:12px;display:flex;flex-direction:column;gap:5px;max-height:220px;overflow:auto}
+.log li{display:grid;grid-template-columns:52px 1fr;gap:6px;color:var(--dim)}
+.log li b{font-weight:400;color:#56697a}
+.log li.info span{color:var(--fg)}
+.log li.warn span{color:var(--amber)}
+.log li.err span{color:var(--red)}
+.log li.good span{color:var(--green)}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px}
+.mini span{color:var(--dim)}
+.mini b{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+/* achievements */
+.ach-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ach{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:14px}
+.ach.got{border-color:#ffb54777}
+.ach-icon{width:46px;height:46px;flex:none;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:20px;border:2px solid var(--line);color:var(--dim);background:#0d1419;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.ach.got .ach-icon,.toast .ach-icon{border-color:var(--amber);color:#1a1205;background:radial-gradient(circle at 40% 35%,#ffe3a6,var(--amber) 70%)}
+.ach h4{margin:0;font-family:var(--display);font-size:16px;text-transform:uppercase;letter-spacing:.04em}
+.ach p{margin:2px 0 0;color:var(--dim);font-size:13px}
+.ach .when{font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:4px}
+.ach:not(.got) h4{color:var(--dim)}
+.toast{position:fixed;z-index:20;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--amber);padding:10px 16px 10px 10px;box-shadow:0 8px 30px #000a;max-width:calc(100% - 32px);animation:toastIn .35s ease-out}
+.toast small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.toast b{font-family:var(--display);font-size:17px;text-transform:uppercase;letter-spacing:.04em}
+@keyframes toastIn{from{transform:translate(-50%,20px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}.logo-ring::before,.logo-ring::after{animation:none}}
+</style>
+
+<!-- ================= MAIN MENU ================= -->
+<section id="menu" class="screen">
+  <div class="menu-card">
+    <div class="logo">
+      <div class="logo-ring" aria-hidden="true"></div>
+      <div><h1>C.A.M.</h1><p>Main Energy Research Facility</p></div>
+    </div>
+    <div class="menu-list">
+      <button class="mbtn primary" data-go="play">Play <small id="playHint">start shift</small></button>
+      <button class="mbtn" data-go="settings">Settings</button>
+      <button class="mbtn" data-go="shop">Shop <span class="coinbadge"><i></i><span class="coinTxt">0</span></span></button>
+      <button class="mbtn" data-go="achievements">Achievements <small id="achCount">0 / 6</small></button>
+      <button class="mbtn" data-go="credits">Credits</button>
+      <button class="mbtn" data-go="exit">Exit</button>
+    </div>
+    <div class="menu-foot"><span>Reactor CAM-R1</span><span>Build 0.1</span></div>
+  </div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section id="settings" class="screen page" hidden>
+  <div class="page-head"><h2>Settings</h2><button class="back" data-go="menu">Back</button></div>
+  <div>
+    <div class="set-row"><div><label for="setSound">Sound</label><p>Reactor hum, buttons and alarms.</p></div><button id="setSound" class="toggle" aria-pressed="true">ON</button></div>
+    <div class="set-row"><div><label for="setVol">Volume</label><p>Master volume.</p></div><input id="setVol" type="range" min="0" max="1" step="0.05"></div>
+    <div class="set-row"><div><label for="setShake">Screen shake</label><p>Shakes the screen during a meltdown.</p></div><button id="setShake" class="toggle" aria-pressed="true">ON</button></div>
+    <div class="set-row"><div><label for="setCheck">Startup checklist</label><p>Shows the startup order in the Main Control Room.</p></div><button id="setCheck" class="toggle" aria-pressed="true">ON</button></div>
+    <div class="set-row"><div><label for="setReset">Reset progress</label><p>Removes all blue coins and shop items.</p></div><button id="setReset" class="danger">Reset</button></div>
+  </div>
+</section>
+
+<!-- ================= SHOP ================= -->
+<section id="shop" class="screen page" hidden>
+  <div class="page-head"><h2>Shop</h2><div class="row-btns"><span class="coinbadge"><i></i><span class="coinTxt">0</span> blue coins</span><button class="back" data-go="menu">Back</button></div></div>
+  <p style="margin:0;color:var(--dim)">Earn blue coins by running the reactor and by escaping meltdowns. Blue coins are only used inside the game.</p>
+  <div id="shopList" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<!-- ================= ACHIEVEMENTS ================= -->
+<section id="achievements" class="screen page" hidden>
+  <div class="page-head"><h2>Achievements</h2><button class="back" data-go="menu">Back</button></div>
+  <p style="margin:0;color:var(--dim)" id="achSummary"></p>
+  <div class="ach-list" id="achList"></div>
+</section>
+
+<!-- ================= CREDITS ================= -->
+<section id="credits" class="screen page" hidden>
+  <div class="page-head"><h2>Credits</h2><button class="back" data-go="menu">Back</button></div>
+  <dl class="credits">
+    <div><dt>Game idea &amp; design</dt><dd>Director of the C.A.M. facility</dd></div>
+    <div><dt>Programming</dt><dd>Built with Claude</dd></div>
+    <div><dt>Fonts</dt><dd>Chakra Petch, IBM Plex Sans, IBM Plex Mono (Google Fonts)</dd></div>
+    <div><dt>Sound</dt><dd>Generated live in your browser</dd></div>
+    <div><dt>Special thanks</dt><dd>Every operator who made it to the surface</dd></div>
+  </dl>
+</section>
+
+<!-- ================= EXIT ================= -->
+<section id="exit" class="screen" hidden>
+  <div class="end-card">
+    <h2>Systems offline</h2>
+    <p>The facility is closed for today. You can close this tab now.</p>
+    <button class="mbtn primary" data-go="menu" style="min-width:220px;justify-content:center">Back to menu</button>
+  </div>
+</section>
+
+<!-- ================= RESULT ================= -->
+<section id="result" class="screen" hidden>
+  <div class="end-card">
+    <h2 id="resTitle">You escaped</h2>
+    <p id="resText"></p>
+    <div class="end-stats">
+      <div><b id="resTime">0:00</b><span>Shift time</span></div>
+      <div><b id="resEarned">0</b><span>Coins earned</span></div>
+      <div><b id="resBonus">0</b><span>Escape bonus</span></div>
+    </div>
+    <div class="row-btns">
+      <button class="mbtn primary" data-go="play">New shift</button>
+      <button class="mbtn" data-go="menu">Main menu</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GAME ================= -->
+<section id="game" class="screen" hidden>
+  <div class="hud" id="hud">
+    <div class="hgrp"><span class="hl">Location</span><span class="hv" id="hLoc">—</span></div>
+    <div class="hgrp"><span class="hl">Reactor</span><span class="pill st-off" id="hStatus">OFFLINE</span></div>
+    <div class="hgrp"><span class="hl">Core temp</span><span class="hv" id="hTemp">0 °C</span></div>
+    <div class="hgrp"><span class="hl">Stability</span><span class="hv" id="hStab">100%</span></div>
+    <div class="hgrp"><span class="hl">Output</span><span class="hv" id="hOut">0 MW</span></div>
+    <div class="spacer"></div>
+    <span class="coinbadge"><i></i><span class="coinTxt">0</span></span>
+    <button class="hud-menu" data-go="menu">Menu</button>
+  </div>
+  <div class="melt-banner" id="meltBanner" hidden>
+    <b>MELTDOWN</b><span class="count" id="meltCount">0.0</span>
+    <p id="meltText">Get to the Surface Section now.</p>
+  </div>
+  <div class="game-grid">
+    <div class="box" id="secBox">
+      <div class="sec-head"><h2 id="secName">Main Section</h2><span class="sec-tag" id="secTag"></span></div>
+      <p class="sec-desc" id="secDesc"></p>
+      <div id="travelBox" class="travel" hidden><div id="travelTxt"></div><div class="bar"><i id="travelBar"></i></div></div>
+      <div class="routes" id="routes"></div>
+      <div class="sec-actions" id="secActions"></div>
+
+      <div class="cr" id="controlRoom" hidden>
+        <div class="subh" style="margin:6px 0 0">Main Control Room · view into the reactor chamber</div>
+        <div class="chamber-wrap"><canvas id="chamber" width="720" height="440"></canvas></div>
+        <div class="gauges">
+          <div class="gauge"><div class="gl">Core temp</div><div class="gv" id="gTemp">0 °C</div><div class="gb"><i id="gbTemp"></i></div></div>
+          <div class="gauge"><div class="gl">Stability</div><div class="gv" id="gStab">100%</div><div class="gb"><i id="gbStab"></i></div></div>
+          <div class="gauge"><div class="gl">Containment</div><div class="gv" id="gCont">0%</div><div class="gb"><i id="gbCont"></i></div></div>
+          <div class="gauge"><div class="gl">Output</div><div class="gv" id="gOut">0 MW</div><div class="gb"><i id="gbOut"></i></div></div>
+        </div>
+        <div class="panel" id="panel"></div>
+        <div id="checkWrap">
+          <div class="subh" style="margin-top:4px">Startup order</div>
+          <ul class="checklist" id="checklist"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="box">
+        <div class="subh" style="margin-top:0">Facility map</div>
+        <svg id="map" viewBox="0 0 300 360" role="img" aria-label="Facility map"></svg>
+      </div>
+      <div class="box">
+        <div class="subh" style="margin-top:0">Reactor (remote readout)</div>
+        <div class="mini">
+          <span>Main reactor</span><b id="mMain">OFF</b>
+          <span>Containment</span><b id="mCont">OFF</b>
+          <span>Lasers</span><b id="mLas">RETRACTED</b>
+          <span>Glass doors</span><b id="mGlass">OPEN</b>
+        </div>
+      </div>
+      <div class="box">
+        <div class="subh" style="margin-top:0">Event log</div>
+        <ul class="log" id="log"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" hidden><span class="ach-icon" id="toastIcon"></span><div><small>Achievement unlocked</small><b id="toastName"></b></div></div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------------- save data ---------------- */
+const store={get(k,d){try{const v=localStorage.getItem('cam_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+             set(k,v){try{localStorage.setItem('cam_'+k,JSON.stringify(v))}catch(e){}}};
+const DEFAULT_SAVE=()=>({coins:0,owned:['laser_default','core_default'],equip:{laser:'laser_default',core:'core_default'},
+  settings:{sound:true,vol:.6,shake:true,checklist:true},ach:{}});
+let save=Object.assign(DEFAULT_SAVE(),store.get('save',{}));
+save.ach=save.ach||{};
+save.settings=Object.assign(DEFAULT_SAVE().settings,save.settings||{});
+save.equip=Object.assign(DEFAULT_SAVE().equip,save.equip||{});
+let saveTimer=0;
+const persist=()=>store.set('save',save);
+const has=id=>save.owned.includes(id);
+
+const SHOP=[
+ {id:'laser_default',cat:'Laser colors',slot:'laser',name:'Standard Issue',price:0,desc:'Cyan energy, green stabilization, amber power lasers.',colors:{energy:'#4fd8ff',stab:'#6dffb0',power:'#ffb547'}},
+ {id:'laser_crimson',cat:'Laser colors',slot:'laser',name:'Crimson Set',price:60,desc:'Hot red beams for every laser group.',colors:{energy:'#ff4f6a',stab:'#ff9a5c',power:'#ff2e2e'}},
+ {id:'laser_violet',cat:'Laser colors',slot:'laser',name:'Violet Set',price:80,desc:'Purple and indigo beams.',colors:{energy:'#b07bff',stab:'#e98bff',power:'#7b8bff'}},
+ {id:'laser_gold',cat:'Laser colors',slot:'laser',name:'Gold Set',price:120,desc:'Bright gold beams. Very shiny.',colors:{energy:'#ffe27a',stab:'#fff3c4',power:'#ffb000'}},
+ {id:'core_default',cat:'Reactor core',slot:'core',name:'Blue Plasma',price:0,desc:'The standard CAM-R1 plasma core.',core:{a:'#e4f6ff',b:'#3d8bff'}},
+ {id:'core_green',cat:'Reactor core',slot:'core',name:'Green Plasma',price:90,desc:'An experimental green plasma mix.',core:{a:'#e2ffe5',b:'#2fd36b'}},
+ {id:'core_solar',cat:'Reactor core',slot:'core',name:'Solar Core',price:150,desc:'Burns like a tiny sun.',core:{a:'#fff6d8',b:'#ff8a1f'}},
+ {id:'core_void',cat:'Reactor core',slot:'core',name:'Void Core',price:250,desc:'A dark core with a purple edge.',core:{a:'#1a0b33',b:'#9b5cff'}},
+ {id:'up_shoes',cat:'Upgrades',slot:null,name:'Running Shoes',price:120,desc:'Move between sections 30% faster.'},
+ {id:'up_coolant',cat:'Upgrades',slot:null,name:'Coolant Upgrade',price:150,desc:'The reactor runs about 240 °C cooler.'},
+ {id:'up_shield',cat:'Upgrades',slot:null,name:'Reinforced Bulkheads',price:140,desc:'+15 seconds to escape during a meltdown.'},
+];
+const item=id=>SHOP.find(s=>s.id===id);
+const laserColors=()=>(item(save.equip.laser)||SHOP[0]).colors;
+const coreColors=()=>(item(save.equip.core)||SHOP[4]).core;
+
+/* ---------------- achievements ---------------- */
+const ACH=[
+ {id:'startup',icon:'⏻',name:'Main Startup Success',desc:'Start the main reactor with every step of the startup order done.'},
+ {id:'meltdown',icon:'☢',name:'The Meltdown',desc:'Let the main reactor go into meltdown.'},
+ {id:'shutdown',icon:'■',name:'Emergency Shutdown Success',desc:'Finish an emergency shutdown and keep the reactor safe.'},
+ {id:'surface',icon:'↑',name:'Surface Escape',desc:'Survive a meltdown by reaching the Surface Section.'},
+ {id:'bunkerB',icon:'β',name:'Bunker Beta Escape',desc:'Survive a meltdown inside Emergency Bunker Beta.'},
+ {id:'bunkerA',icon:'α',name:'Bunker Alpha Escape',desc:'Survive a meltdown inside Emergency Bunker Alpha.'},
+];
+let toastTimer=0;
+function unlock(id){
+  if(save.ach[id]) return;
+  const a=ACH.find(x=>x.id===id); if(!a) return;
+  save.ach[id]=Date.now(); persist(); updateCoins();
+  $('#toastIcon').textContent=a.icon; $('#toastName').textContent=a.name; $('#toast').hidden=false;
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').hidden=true,3500);
+  beep(784,.12,'triangle',.14); beep(1047,.12,'triangle',.14,.12); beep(1319,.25,'triangle',.14,.24);
+}
+function renderAch(){
+  const n=ACH.filter(a=>save.ach[a.id]).length;
+  $('#achSummary').textContent=`${n} of ${ACH.length} unlocked.`;
+  $('#achList').innerHTML=ACH.map(a=>{const t=save.ach[a.id];
+    return `<div class="ach ${t?'got':''}"><span class="ach-icon">${t?a.icon:'?'}</span><div><h4>${a.name}</h4><p>${a.desc}</p>${t?`<div class="when">Unlocked ${new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>`:''}</div></div>`;}).join('');
+}
+
+/* ---------------- facility ---------------- */
+const SECTIONS={
+ surface:{name:'Surface Section',tag:'Level 0',x:150,y:24,links:['A'],desc:'Helipad, guard post and the top of the elevator shafts. Open sky and cold wind. If the reactor melts down, this is where you need to be.'},
+ A:{name:'Sector A',tag:'Level −1',x:150,y:78,links:['surface','B','C'],desc:'Reception and the security checkpoint. Elevators lead down to the research levels.'},
+ B:{name:'Sector B',tag:'Level −2',x:70,y:136,links:['A','zero','bunkerB'],desc:'Laser calibration labs. Spare laser lenses and emitter parts line the walls.'},
+ C:{name:'Sector C',tag:'Level −2',x:230,y:130,links:['A','D'],desc:'Living quarters and the cafeteria for the research staff.'},
+ D:{name:'Sector D',tag:'Level −3',x:230,y:186,links:['C','zero','bunkerA'],desc:'Coolant pumping station. Huge pipes hum with chilled water headed for the reactor.'},
+ bunkerA:{name:'Emergency Bunker Alpha',tag:'Sector D · shelter',x:250,y:240,links:['D'],bunker:true,desc:'A blast-proof shelter behind a meter-thick steel door, with air tanks, water and bunk beds. If the reactor melts down, you can survive in here.'},
+ bunkerB:{name:'Emergency Bunker Beta',tag:'Sector B · shelter',x:60,y:186,links:['B'],bunker:true,desc:'A blast-proof shelter dug into the rock under the laser labs. Thick walls, emergency lights and supplies for a long wait. If the reactor melts down, you can survive in here.'},
+ zero:{name:'Section Zero',tag:'Level −4',x:150,y:234,links:['B','D','epsilon'],desc:'The old first-generation test chamber, sealed since the early days of the facility.'},
+ epsilon:{name:'Section Epsilon',tag:'Level −5',x:150,y:284,links:['zero','main'],desc:'Power distribution hub. Thick cables carry energy from the reactor to the whole facility.'},
+ main:{name:'Main Section',tag:'Level −6',x:150,y:334,links:['epsilon'],desc:'Home of the main reactor. The Main Control Room looks into the reactor chamber through the glass protection doors.'},
+};
+
+const isSafe=k=>k==='surface'||!!SECTIONS[k].bunker;
+let S; // shift state
+function newShift(){
+  S={loc:'main',time:0,travel:null,melt:null,blocked:null,shutdown:null,ended:false,earned:0,frac:0,
+     surgeIn:30+Math.random()*25,search:{},warnBeep:0,alarm:0,logs:[],
+     r:{contain:false,main:false,glass:false,ext:false,energy:false,stab:false,power:false,
+        contA:0,extA:0,glassA:0,temp:20,stability:100,out:0}};
+  log('Shift started. You are in the Main Control Room.','info');
+  renderSection(); buildMap();
+}
+
+/* ---------------- audio ---------------- */
+let AC=null,master=null,humGain=null,humOsc=null;
+function initAudio(){
+  if(AC) return;
+  try{
+    AC=new (window.AudioContext||window.webkitAudioContext)();
+    master=AC.createGain(); master.connect(AC.destination);
+    humOsc=AC.createOscillator(); humOsc.type='sawtooth'; humOsc.frequency.value=55;
+    const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=260;
+    humGain=AC.createGain(); humGain.gain.value=0;
+    humOsc.connect(lp); lp.connect(humGain); humGain.connect(master); humOsc.start();
+    applyVol();
+  }catch(e){AC=null}
+}
+function applyVol(){ if(master) master.gain.value=save.settings.sound?save.settings.vol:0; }
+function beep(f,d=.08,type='square',g=.12,delay=0){
+  if(!AC||!save.settings.sound) return;
+  const t=AC.currentTime+delay, o=AC.createOscillator(), a=AC.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t); a.gain.setValueAtTime(g,t); a.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(a); a.connect(master); o.start(t); o.stop(t+d+.02);
+}
+document.addEventListener('pointerdown',()=>{initAudio(); if(AC&&AC.state==='suspended')AC.resume();},{passive:true});
+document.addEventListener('click',e=>{ if(e.target.closest('button')) beep(1200,.03,'square',.05); });
+
+/* ---------------- screens ---------------- */
+let screen='menu';
+function show(id){
+  if(id==='play'){ if(!S||S.ended) newShift(); id='game'; }
+  screen=id;
+  $$('.screen').forEach(s=>s.hidden=s.id!==id);
+  if(id==='shop') renderShop();
+  if(id==='settings') renderSettings();
+  if(id==='achievements') renderAch();
+  if(id==='menu') $('#playHint').textContent=(S&&!S.ended)?'resume shift':'start shift';
+  if(id!=='game' && humGain) humGain.gain.value=0;
+  updateCoins(); window.scrollTo(0,0);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-go]'); if(!b) return;
+  const g=b.dataset.go;
+  if(g==='exit'){ show('exit'); try{window.close()}catch(_){} return; }
+  show(g);
+});
+function updateCoins(){ $$('.coinTxt').forEach(el=>el.textContent=save.coins.toLocaleString('en-US'));
+  $('#achCount').textContent=`${ACH.filter(a=>save.ach[a.id]).length} / ${ACH.length}`; }
+
+/* ---------------- settings ---------------- */
+function setToggle(el,v){el.setAttribute('aria-pressed',v);el.textContent=v?'ON':'OFF';}
+function renderSettings(){
+  setToggle($('#setSound'),save.settings.sound); setToggle($('#setShake'),save.settings.shake); setToggle($('#setCheck'),save.settings.checklist);
+  $('#setVol').value=save.settings.vol; const r=$('#setReset'); r.classList.remove('armed'); r.textContent='Reset';
+}
+$('#setSound').onclick=()=>{save.settings.sound=!save.settings.sound;applyVol();persist();renderSettings();};
+$('#setShake').onclick=()=>{save.settings.shake=!save.settings.shake;persist();renderSettings();};
+$('#setCheck').onclick=()=>{save.settings.checklist=!save.settings.checklist;persist();renderSettings();};
+$('#setVol').oninput=e=>{save.settings.vol=+e.target.value;applyVol();persist();};
+$('#setReset').onclick=e=>{
+  const b=e.currentTarget;
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Tap again to confirm';return;}
+  const keep=save.settings; save=DEFAULT_SAVE(); save.settings=keep; persist(); S=null; updateCoins();
+  b.classList.remove('armed'); b.textContent='Progress reset';
+};
+
+/* ---------------- shop ---------------- */
+function renderShop(){
+  const cats=[...new Set(SHOP.map(s=>s.cat))];
+  $('#shopList').innerHTML=cats.map(c=>`<div class="shop-cat"><h3>${c}</h3><div class="shop-grid">${
+    SHOP.filter(s=>s.cat===c).map(s=>{
+      const own=has(s.id), eq=s.slot&&save.equip[s.slot]===s.id;
+      let sw='';
+      if(s.colors) sw=`<div class="swatches">${Object.values(s.colors).map(c=>`<span style="background:${c}"></span>`).join('')}</div>`;
+      if(s.core) sw=`<div class="swatches"><span style="background:radial-gradient(circle,${s.core.a},${s.core.b})"></span></div>`;
+      let btn;
+      if(!own) btn=`<button class="buy" data-buy="${s.id}" ${save.coins<s.price?'disabled':''}>Buy · ${s.price} coins</button>`;
+      else if(s.slot) btn=`<button data-equip="${s.id}" ${eq?'disabled':''}>${eq?'Equipped':'Equip'}</button>`;
+      else btn=`<button disabled>Owned</button>`;
+      return `<div class="item ${eq?'equipped':''}">${sw}<h4>${s.name}</h4><p>${s.desc}</p>${btn}</div>`;
+    }).join('')}</div></div>`).join('');
+}
+$('#shopList').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.buy){const s=item(b.dataset.buy); if(save.coins>=s.price){save.coins-=s.price; save.owned.push(s.id); if(s.slot) save.equip[s.slot]=s.id; persist(); beep(660,.08,'triangle',.15); beep(990,.12,'triangle',.15,.08);}}
+  if(b.dataset.equip){const s=item(b.dataset.equip); save.equip[s.slot]=s.id; persist();}
+  renderShop(); updateCoins();
+});
+
+/* ---------------- log ---------------- */
+function fmtT(t){t=Math.floor(t);return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`}
+function log(msg,kind='info'){
+  if(!S) return;
+  S.logs.unshift({t:S.time,msg,kind}); S.logs.length=Math.min(S.logs.length,30);
+  $('#log').innerHTML=S.logs.map(l=>`<li class="${l.kind}"><b>T+${fmtT(l.t)}</b><span>${l.msg}</span></li>`).join('');
+  if(kind==='err') beep(180,.18,'sawtooth',.12);
+  if(kind==='warn') beep(700,.12,'square',.08);
+}
+
+/* ---------------- map ---------------- */
+function buildMap(){
+  const svg=$('#map'); let h='';
+  const done=new Set();
+  for(const [k,s] of Object.entries(SECTIONS)) for(const l of s.links){
+    const key=[k,l].sort().join('-'); if(done.has(key)) continue; done.add(key);
+    const o=SECTIONS[l]; h+=`<line class="edge" data-e="${key}" x1="${s.x}" y1="${s.y}" x2="${o.x}" y2="${o.y}"/>`;
+  }
+  for(const [k,s] of Object.entries(SECTIONS)){
+    const label=k==='surface'?'SURFACE':k==='zero'?'ZERO':k==='epsilon'?'EPSILON':k==='main'?'MAIN':k==='bunkerA'?'BUNKER ALPHA':k==='bunkerB'?'BUNKER BETA':'SECTOR '+k;
+    h+=`<g class="node" data-n="${k}"><rect x="${s.x-42}" y="${s.y-12}" width="84" height="24" rx="3"/><text x="${s.x}" y="${s.y+1}">${label}</text></g>`;
+  }
+  h+=`<circle class="you" id="youDot" r="5" cx="0" cy="0"/>`;
+  svg.innerHTML=h;
+  svg.onclick=e=>{const n=e.target.closest('.node'); if(n) go(n.dataset.n);};
+  updateMap();
+}
+function updateMap(){
+  if(!S) return;
+  const adj=S.travel?[]:SECTIONS[S.loc].links;
+  $$('#map .node').forEach(n=>{const k=n.dataset.n;
+    n.classList.toggle('here',k===S.loc&&!S.travel); n.classList.toggle('adj',adj.includes(k)&&S.blocked!==k);
+    n.classList.toggle('col',S.blocked===k); n.classList.toggle('surf',isSafe(k));});
+  $$('#map .edge').forEach(e=>e.classList.toggle('hot',!!S.melt));
+}
+function placeYou(){
+  const d=$('#youDot'); if(!d||!S) return;
+  let a=SECTIONS[S.loc],x=a.x,y=a.y;
+  if(S.travel){const b=SECTIONS[S.travel.to],p=S.travel.t/S.travel.dur;x=a.x+(b.x-a.x)*p;y=a.y+(b.y-a.y)*p;}
+  else {x=a.x+50>292?a.x-50:a.x+50;}
+  d.setAttribute('cx',x); d.setAttribute('cy',y);
+}
+
+/* ---------------- movement ---------------- */
+function go(to){
+  if(!S||S.ended||S.travel) return;
+  if(to===S.loc) return;
+  if(!SECTIONS[S.loc].links.includes(to)) return;
+  if(S.blocked===to){log(`The way into ${SECTIONS[to].name} has collapsed. Find another route.`,'err');return;}
+  const dur=(S.melt?4:2.5)*(has('up_shoes')?.7:1);
+  S.travel={to,t:0,dur}; beep(440,.06,'triangle',.08);
+  renderSection();
+}
+function arrive(){
+  S.loc=S.travel.to; S.travel=null; beep(620,.06,'triangle',.08);
+  renderSection();
+  if(S.melt && isSafe(S.loc)) endShift(true);
+}
+
+/* ---------------- section panel ---------------- */
+function renderSection(){
+  if(!S) return;
+  const s=SECTIONS[S.loc];
+  $('#secName').textContent=s.name; $('#secTag').textContent=s.tag; $('#secDesc').textContent=s.desc;
+  $('#hLoc').textContent=S.travel?`→ ${SECTIONS[S.travel.to].name}`:s.name;
+  $('#travelBox').hidden=!S.travel;
+  if(S.travel) $('#travelTxt').textContent=`Moving to ${SECTIONS[S.travel.to].name}…`;
+  const order=['surface','A','B','C','D','zero','epsilon','main'];
+  const rank=k=>SECTIONS[k].bunker?-1:order.indexOf(k);
+  $('#routes').innerHTML=S.travel?'':s.links.slice().sort((a,b)=>rank(a)-rank(b)).map(l=>{
+    const col=S.blocked===l, bunk=!!SECTIONS[l].bunker, up=!bunk&&order.indexOf(l)<order.indexOf(S.loc);
+    const icon=col?'✕ ':bunk?'▣ ':up?'↑ ':'↓ ';
+    return `<button class="route ${col?'collapsed':''} ${(up||bunk)&&S.melt?'up':''}" data-to="${l}">${icon}${SECTIONS[l].name}${col?' (collapsed)':''}</button>`;}).join('');
+  let acts='';
+  if(!S.travel && S.loc!=='main' && S.loc!=='surface' && !S.melt) acts+=`<button class="act" id="searchBtn">Search for supplies</button>`;
+  if(!S.travel && S.loc==='surface' && !S.melt) acts+=`<button class="act" id="endBtn">End shift and go home</button>`;
+  $('#secActions').innerHTML=acts;
+  $('#controlRoom').hidden=!(S.loc==='main'&&!S.travel);
+  if(S.loc==='main') buildPanel();
+  updateMap(); updateSearchBtn();
+}
+$('#routes').addEventListener('click',e=>{const b=e.target.closest('[data-to]'); if(b) go(b.dataset.to);});
+$('#secActions').addEventListener('click',e=>{
+  if(e.target.id==='searchBtn'){
+    const cd=S.search[S.loc]||0; if(S.time<cd) return;
+    const n=1+Math.floor(Math.random()*4); save.coins+=n; S.earned+=n; persist(); updateCoins();
+    S.search[S.loc]=S.time+45; log(`Found ${n} blue coin${n>1?'s':''} in ${SECTIONS[S.loc].name}.`,'good'); beep(880,.08,'triangle',.12); updateSearchBtn();
+  }
+  if(e.target.id==='endBtn'){ S.ended=true; persist(); show('menu'); }
+});
+function updateSearchBtn(){
+  const b=$('#searchBtn'); if(!b) return;
+  const left=Math.ceil((S.search[S.loc]||0)-S.time);
+  b.disabled=left>0; b.textContent=left>0?`Searched · again in ${left}s`:'Search for supplies';
+}
+
+/* ---------------- control panel ---------------- */
+const BTNS=[
+ {id:'contain',label:r=>r.contain?'Disengage containment field':'Startup containment field',on:r=>r.contain,c:'#4fd8ff'},
+ {id:'ext',label:r=>r.ext?'Retract all lasers & close laser doors':'Extend all lasers',on:r=>r.ext,c:'#ffb547',sub:r=>r.extA>=1?(r.ext?'extended':'retracted'):(r.ext?'extending…':r.extA>0?'retracting…':'retracted')},
+ {id:'stab',label:()=>'Stabilization lasers · left / right',on:r=>r.stab,c:()=>laserColors().stab,laser:true},
+ {id:'energy',label:()=>'Energy lasers · upper / lower',on:r=>r.energy,c:()=>laserColors().energy,laser:true},
+ {id:'power',label:()=>'Power lasers · corners',on:r=>r.power,c:()=>laserColors().power,laser:true},
+ {id:'glass',label:r=>r.glass?'Open glass protection doors':'Close glass protection doors',on:r=>r.glass,c:'#9fd3ff',sub:r=>r.glassA>=1?'closed':r.glassA<=0?'open':(r.glass?'closing…':'opening…')},
+ {id:'main',label:r=>r.main?'Main power down':'Main startup',on:r=>r.main,c:'#5fe39a'},
+ {id:'emerg',label:()=>'Emergency shutdown',on:()=>!!S.shutdown,c:'#ff4d4d'},
+];
+function buildPanel(){
+  $('#panel').innerHTML=BTNS.map(b=>`<button class="pbtn ${b.id==='emerg'?'emerg':''}" data-act="${b.id}"><span class="lamp"></span><span class="pl"></span><span class="ps"></span></button>`).join('');
+  updatePanel();
+}
+function updatePanel(){
+  if(!S) return; const r=S.r;
+  for(const b of BTNS){
+    const el=$(`#panel [data-act="${b.id}"]`); if(!el) continue;
+    const on=b.on(r); el.classList.toggle('lit',on);
+    const c=typeof b.c==='function'?b.c():b.c; el.style.setProperty('--lampc',c);
+    const lbl=b.label(r); const pl=el.querySelector('.pl'); if(pl.textContent!==lbl) pl.textContent=lbl;
+    let sub=b.sub?b.sub(r):(on?'ON':'OFF');
+    if(b.id==='emerg') sub=S.shutdown?`in progress · ${Math.ceil(S.shutdown.t)}s`:'stops everything';
+    if(b.laser && !(r.ext&&r.extA>=1)) sub='laser doors closed';
+    const ps=el.querySelector('.ps'); if(ps.textContent!==sub) ps.textContent=sub;
+    el.classList.toggle('blocked',!!(S.melt||S.shutdown) && b.id!=='emerg' || (b.laser&&!(r.ext&&r.extA>=1)));
+  }
+  const ck=[['Containment field online',r.contain&&r.contA>=1],['All lasers extended',r.ext&&r.extA>=1],['Stabilization lasers on',r.stab],['Energy lasers on',r.energy],['Power lasers on',r.power],['Glass protection doors closed',r.glass&&r.glassA>=1],['Main startup',r.main]];
+  $('#checkWrap').hidden=!save.settings.checklist;
+  const html=ck.map(([t,ok])=>`<li class="${ok?'ok':''}">${t}</li>`).join('');
+  if($('#checklist').innerHTML!==html) $('#checklist').innerHTML=html;
+}
+$('#panel').addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(b) act(b.dataset.act);});
+function act(id){
+  const r=S.r;
+  if(S.melt){ log(id==='emerg'?'Emergency shutdown failed. The meltdown cannot be stopped. Evacuate!':'Controls are not responding. Evacuate to the surface!','err'); return; }
+  if(S.shutdown && id!=='emerg'){ log('Emergency shutdown in progress. Controls are locked.','warn'); return; }
+  switch(id){
+    case 'contain':
+      r.contain=!r.contain;
+      if(r.contain) log('Containment field starting up.','info');
+      else log(r.main?'Containment field disengaged while the reactor is running!':'Containment field disengaged.',r.main?'err':'info');
+      beep(r.contain?520:300,.15,'sine',.15); break;
+    case 'main':
+      if(!r.main){ r.main=true;
+        if(!r.contain) log('Main startup without the containment field! The core is unstable!','err');
+        else if(!(r.glass&&r.glassA>=1)) log('Main startup with the glass protection doors open.','warn');
+        else log('Main startup. The reactor is coming online.','good');
+        if(r.contain&&r.contA>=1&&r.ext&&r.extA>=1&&r.stab&&r.energy&&r.power&&r.glass&&r.glassA>=1) unlock('startup');
+        beep(220,.4,'sawtooth',.12); beep(330,.4,'sawtooth',.1,.15);
+      } else { r.main=false; log('Main reactor powering down.','info'); beep(330,.4,'sawtooth',.1); beep(200,.5,'sawtooth',.1,.15); }
+      break;
+    case 'glass':
+      r.glass=!r.glass; log(r.glass?'Closing glass protection doors.':'Opening glass protection doors.', (!r.glass&&r.main)?'warn':'info'); beep(260,.25,'triangle',.12); break;
+    case 'ext':
+      if(r.ext){ r.energy=r.stab=r.power=false; r.ext=false; log('All lasers off. Retracting lasers and closing laser doors.','info'); }
+      else { r.ext=true; log('Opening laser doors and extending all lasers.','info'); }
+      beep(180,.35,'triangle',.12); break;
+    case 'energy': case 'stab': case 'power': {
+      const names={energy:'Energy lasers',stab:'Stabilization lasers',power:'Power lasers'};
+      if(!r[id] && !(r.ext&&r.extA>=1)){ log(`${names[id]}: laser doors are closed. Extend all lasers first.`,'err'); return; }
+      r[id]=!r[id];
+      if(r[id] && id==='power' && !r.stab) log('Power lasers on without stabilization lasers! Stability dropping!','err');
+      else log(`${names[id]} ${r[id]?'on':'off'}.`, 'info');
+      beep(r[id]?900:500,.1,'square',.1); break; }
+    case 'emerg':
+      if(S.shutdown) return;
+      S.shutdown={t:8}; r.energy=r.stab=r.power=false; r.ext=false; r.main=false; r.glass=true;
+      log('EMERGENCY SHUTDOWN. All lasers off, reactor scramming, glass doors closing.','warn');
+      beep(500,.3,'sawtooth',.15); beep(350,.3,'sawtooth',.15,.3); beep(250,.4,'sawtooth',.15,.6); break;
+  }
+  updatePanel();
+}
+
+/* ---------------- simulation ---------------- */
+function approach(v,t,rate,dt){ return v<t?Math.min(t,v+rate*dt):Math.max(t,v-rate*dt); }
+function startMeltdown(reason){
+  const r=S.r; const total=45+(has('up_shield')?15:0);
+  S.melt={t:total,total}; S.blocked=Math.random()<.5?'B':'D'; S.shutdown=null;
+  log(`MELTDOWN: ${reason}`,'err'); unlock('meltdown');
+  log(`Debris has blocked ${SECTIONS[S.blocked].name}. Find another way up!`,'err');
+  const lost=S.blocked==='B'?'Emergency Bunker Beta':'Emergency Bunker Alpha';
+  $('#meltText').textContent=`Get to the Surface Section or an emergency bunker! ${SECTIONS[S.blocked].name} has collapsed, so ${lost} is cut off — use another route.`;
+  renderSection();
+  if(isSafe(S.loc)) endShift(true);
+}
+function update(dt){
+  const r=S.r; S.time+=dt;
+  r.contA=approach(r.contA,r.contain?1:0,.9,dt);
+  r.extA=approach(r.extA,r.ext?1:0,.5,dt);
+  r.glassA=approach(r.glassA,r.glass?1:0,.7,dt);
+  const ready=r.extA>=1;
+  const E=r.energy&&ready, ST=r.stab&&ready, P=r.power&&ready;
+  const cont=r.contA, glassOpen=r.glassA<1;
+  if(S.melt){
+    r.temp=Math.min(160,r.temp+1.4*dt); r.stability=approach(r.stability,0,20,dt); r.out=approach(r.out,0,300,dt);
+    S.melt.t-=dt;
+    S.alarm-=dt; if(S.alarm<=0){S.alarm=.9; beep(880,.35,'sawtooth',.12); beep(620,.35,'sawtooth',.12,.42);}
+    if(S.melt.t<=0){ S.melt.t=0; endShift(false); return; }
+  } else {
+    const cool=has('up_coolant')?8:0;
+    let target, stabT;
+    if(r.main){
+      target=38+(E?18:0)+(P?32:0)-(ST?12:0)+(glassOpen?8:0)+(1-cont)*35-cool;
+      stabT=100-(P&&!ST?75:0)-(E&&!ST?20:0)-(1-cont)*65-Math.max(0,r.temp-75)*2-(glassOpen?5:0);
+    } else { target=20+((E||P)?4:0); stabT=100; }
+    const k=S.shutdown?.14:.06;
+    r.temp+= (target-r.temp)*k*dt + (r.main?(Math.random()-.5)*.6*dt:0);
+    r.stability+= (stabT-r.stability)*.08*dt;
+    r.stability=clamp(r.stability,0,100); r.temp=Math.max(15,r.temp);
+    const outT=r.main?(150+(E?600:0)+(P?1400:0))*(r.stability/100)*(.4+.6*cont):0;
+    r.out=approach(r.out,outT,400,dt);
+    if(r.main){
+      S.surgeIn-=dt;
+      if(S.surgeIn<=0){ S.surgeIn=25+Math.random()*30; r.stability-=ST?10:26; r.temp+=6; log('Plasma surge detected in the core.','warn'); }
+      if(r.temp>=100) startMeltdown('core temperature over the limit.');
+      else if(r.stability<=0) startMeltdown('the core lost all stability.');
+    }
+    if(S.shutdown){ S.shutdown.t-=dt; if(S.shutdown.t<=0){S.shutdown=null; log('Emergency shutdown complete. The reactor is safe.','good'); unlock('shutdown');} }
+    S.frac+=r.out/2200*.8*dt;
+    while(S.frac>=1){S.frac-=1; save.coins++; S.earned++; updateCoins();}
+    const warn=r.main&&(r.temp>85||r.stability<35);
+    S.warnBeep-=dt; if(warn&&S.warnBeep<=0){S.warnBeep=1.4; beep(1000,.1,'square',.07);}
+  }
+  if(S.travel){ S.travel.t+=dt; $('#travelBar').style.width=(S.travel.t/S.travel.dur*100)+'%'; if(S.travel.t>=S.travel.dur) arrive(); }
+  saveTimer+=dt; if(saveTimer>3){saveTimer=0;persist();}
+  if(humGain&&AC){ const g=r.main||S.melt?(.04+r.out/2200*.07+(S.melt?.05:0)):0; humGain.gain.setTargetAtTime(g,AC.currentTime,.3); humOsc.frequency.setTargetAtTime(S.melt?42+Math.random()*10:55+r.out/2200*20,AC.currentTime,.2); }
+}
+function endShift(ok){
+  if(S.ended) return; S.ended=true;
+  const bunker=ok&&SECTIONS[S.loc].bunker;
+  const bonus=ok?(bunker?50:75)+Math.floor(S.melt?S.melt.t:0):0;
+  save.coins+=bonus; persist();
+  if(ok) unlock(S.loc==='surface'?'surface':S.loc);
+  $('#resTitle').textContent=!ok?'Facility lost':bunker?'You survived in the bunker':'You escaped';
+  $('#resText').textContent=!ok?'The main reactor detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker the moment the alarms start.'
+    :bunker?`You sealed yourself inside ${SECTIONS[S.loc].name} with ${S.melt.t.toFixed(1)} seconds to spare. The whole facility shook, but the bunker held. Rescue teams dug you out the next morning.`
+    :`You reached the Surface Section with ${S.melt.t.toFixed(1)} seconds to spare. The main reactor detonated far below you.`;
+  $('#resTime').textContent=fmtT(S.time); $('#resEarned').textContent=S.earned; $('#resBonus').textContent=bonus;
+  if(humGain) humGain.gain.value=0;
+  ok?(beep(523,.15,'triangle',.15),beep(659,.15,'triangle',.15,.15),beep(784,.3,'triangle',.15,.3)):beep(90,1.2,'sawtooth',.2);
+  setTimeout(()=>{ $('#game').style.transform=''; show('result'); },ok?400:900);
+}
+
+/* ---------------- HUD ---------------- */
+let hudT=0;
+function hud(){
+  const r=S.r;
+  const tC=Math.round(r.temp*30);
+  $('#hTemp').textContent=tC.toLocaleString('en-US')+' °C';
+  $('#hStab').textContent=Math.round(r.stability)+'%';
+  $('#hOut').textContent=Math.round(r.out).toLocaleString('en-US')+' MW';
+  const warn=r.main&&(r.temp>85||r.stability<35);
+  const st=S.melt?['MELTDOWN','st-melt']:S.shutdown?['EMERGENCY SHUTDOWN','st-shut']:!r.main?['OFFLINE','st-off']:warn?['WARNING','st-warn']:['ONLINE','st-on'];
+  const p=$('#hStatus'); p.textContent=st[0]; p.className='pill '+st[1];
+  $('#meltBanner').hidden=!S.melt;
+  if(S.melt) $('#meltCount').textContent=S.melt.t.toFixed(1)+'s';
+  $('#mMain').textContent=r.main?'ON':'OFF';
+  $('#mCont').textContent=r.contain?Math.round(r.contA*100)+'%':'OFF';
+  $('#mLas').textContent=r.extA>=1?(r.ext?'EXTENDED':'RETRACTED'):r.extA>0?'MOVING':'RETRACTED';
+  $('#mGlass').textContent=r.glassA>=1?'CLOSED':r.glassA<=0?'OPEN':'MOVING';
+  if(S.loc==='main'&&!S.travel){
+    $('#gTemp').textContent=tC.toLocaleString('en-US')+' °C';
+    $('#gStab').textContent=Math.round(r.stability)+'%';
+    $('#gCont').textContent=Math.round(r.contA*100)+'%';
+    $('#gOut').textContent=Math.round(r.out).toLocaleString('en-US')+' MW';
+    const bar=(id,v,c)=>{const e=$(id);e.style.width=clamp(v,0,100)+'%';e.style.background=c;};
+    bar('#gbTemp',r.temp,r.temp>85?'var(--red)':r.temp>70?'var(--amber)':'var(--cyan)');
+    bar('#gbStab',r.stability,r.stability<35?'var(--red)':r.stability<60?'var(--amber)':'var(--green)');
+    bar('#gbCont',r.contA*100,'var(--cyan)');
+    bar('#gbOut',r.out/2200*100,'var(--coin)');
+    updatePanel();
+  }
+  updateSearchBtn();
+}
+
+/* ---------------- chamber drawing ---------------- */
+const cv=$('#chamber'), g=cv.getContext('2d'); const W=720,H=440,CX=360,CY=220;
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function drawChamber(t){
+  const r=S.r, lc=laserColors(), cc=coreColors();
+  g.setTransform(1,0,0,1,0,0);
+  const bg=g.createRadialGradient(CX,CY,40,CX,CY,420); bg.addColorStop(0,'#101b23'); bg.addColorStop(1,'#04070a');
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  g.strokeStyle='rgba(120,160,190,.06)'; g.lineWidth=1;
+  for(let x=0;x<=W;x+=40){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke();}
+  for(let y=0;y<=H;y+=40){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke();}
+  // floor ring
+  g.strokeStyle='rgba(120,160,190,.18)'; g.lineWidth=2; g.beginPath(); g.ellipse(CX,CY+120,190,28,0,0,Math.PI*2); g.stroke();
+  // core
+  const on=r.main||S.melt; const pulse=Math.sin(t*(S.melt?14:3))*(on?4:1.5);
+  const coreR=30+pulse+(r.out/2200)*10;
+  const heat=clamp((r.temp-70)/30,0,1);
+  if(on){ const halo=g.createRadialGradient(CX,CY,coreR*.5,CX,CY,coreR*3.2+heat*40);
+    halo.addColorStop(0,hexA(cc.b,.45)); halo.addColorStop(1,hexA(cc.b,0)); g.fillStyle=halo; g.beginPath(); g.arc(CX,CY,coreR*3.2+heat*40,0,Math.PI*2); g.fill();
+    if(heat>0){ const hh=g.createRadialGradient(CX,CY,coreR,CX,CY,coreR*4); hh.addColorStop(0,`rgba(255,80,60,${.45*heat})`); hh.addColorStop(1,'rgba(255,80,60,0)'); g.fillStyle=hh; g.beginPath(); g.arc(CX,CY,coreR*4,0,Math.PI*2); g.fill(); } }
+  const cg=g.createRadialGradient(CX-coreR*.3,CY-coreR*.3,2,CX,CY,coreR);
+  cg.addColorStop(0,on?cc.a:'#5d6b74'); cg.addColorStop(1,on?cc.b:'#1f2a31');
+  g.globalAlpha=on?1:.85; g.fillStyle=cg; g.beginPath(); g.arc(CX,CY,coreR,0,Math.PI*2); g.fill(); g.globalAlpha=1;
+  // containment field
+  if(r.contA>0){
+    const a=r.contA*(S.melt?(.4+.4*Math.random()):1);
+    g.strokeStyle=`rgba(120,210,255,${.55*a})`; g.lineWidth=2; g.beginPath(); g.arc(CX,CY,82,0,Math.PI*2); g.stroke();
+    g.fillStyle=`rgba(80,170,255,${.07*a})`; g.fill();
+    g.lineWidth=3;
+    for(let i=0;i<10;i++){const s=t*.6+i*Math.PI/5; g.strokeStyle=`rgba(170,230,255,${.5*a})`; g.beginPath(); g.arc(CX,CY,88,s,s+.28); g.stroke();}
+    for(let i=0;i<6;i++){const s=-t*.9+i*Math.PI/3; g.strokeStyle=`rgba(170,230,255,${.3*a})`; g.beginPath(); g.arc(CX,CY,74,s,s+.4); g.stroke();}
+  }
+  // lasers
+  const ready=r.extA>=1, doorP=clamp(r.extA*2,0,1), armP=clamp(r.extA*2-1,0,1);
+  const ems=[
+    {k:'energy',x:CX,y:0},{k:'energy',x:CX,y:H},
+    {k:'stab',x:0,y:CY},{k:'stab',x:W,y:CY},
+    {k:'power',x:0,y:0},{k:'power',x:W,y:0},{k:'power',x:0,y:H},{k:'power',x:W,y:H}];
+  for(const e of ems){
+    const ang=Math.atan2(CY-e.y,CX-e.x), dist=Math.hypot(CX-e.x,CY-e.y);
+    g.save(); g.translate(e.x,e.y); g.rotate(ang);
+    const col=lc[e.k];
+    // wall housing
+    g.fillStyle='#1b262e'; g.strokeStyle='#33444f'; g.lineWidth=1.5;
+    g.fillRect(-10,-26,46,52); g.strokeRect(-10,-26,46,52);
+    // arm
+    const armLen=8+armP*58;
+    g.fillStyle='#3a4a55'; g.fillRect(20,-6,armLen,12);
+    const hx=20+armLen;
+    g.fillStyle='#53646f'; g.beginPath(); g.arc(hx,0,10,0,Math.PI*2); g.fill();
+    const firing=r[e.k]&&ready;
+    g.fillStyle=firing?col:'#20292f'; g.beginPath(); g.arc(hx+4,0,5,0,Math.PI*2); g.fill();
+    // laser doors (cover the housing mouth)
+    if(doorP<1){ const off=doorP*24;
+      g.fillStyle='#2c3a44'; g.strokeStyle='#4a5d69';
+      g.fillRect(36,-26-off,9,26); g.strokeRect(36,-26-off,9,26);
+      g.fillRect(36,0+off,9,26); g.strokeRect(36,0+off,9,26);
+      g.fillStyle='#e0b640'; g.fillRect(38,-24-off,5,3); g.fillRect(38,21+off,5,3);
+    }
+    // beam
+    if(firing){
+      const end=dist-(r.contA>.5?86:coreR); const fl=.75+Math.random()*.25*(S.melt?2:1);
+      g.globalCompositeOperation='lighter';
+      g.strokeStyle=hexA(col,.25*fl); g.lineWidth=14; g.beginPath(); g.moveTo(hx+6,0); g.lineTo(end,0); g.stroke();
+      g.strokeStyle=hexA(col,.8*fl); g.lineWidth=4; g.beginPath(); g.moveTo(hx+6,0); g.lineTo(end,0); g.stroke();
+      g.strokeStyle=`rgba(255,255,255,${.85*fl})`; g.lineWidth=1.4; g.beginPath(); g.moveTo(hx+6,0); g.lineTo(end,0); g.stroke();
+      g.fillStyle=hexA(col,.5); g.beginPath(); g.arc(end,0,6+Math.random()*3,0,Math.PI*2); g.fill();
+      g.globalCompositeOperation='source-over';
+    }
+    g.restore();
+  }
+  // glass protection doors (between the control room and the chamber)
+  if(r.glassA>0){
+    const w=(W/2)*r.glassA;
+    g.fillStyle='rgba(140,200,235,.10)'; g.fillRect(0,0,w,H); g.fillRect(W-w,0,w,H);
+    g.strokeStyle='rgba(170,220,245,.45)'; g.lineWidth=3;
+    g.beginPath(); g.moveTo(w,0); g.lineTo(w,H); g.moveTo(W-w,0); g.lineTo(W-w,H); g.stroke();
+    g.strokeStyle='rgba(220,240,255,.10)'; g.lineWidth=18;
+    g.save(); g.beginPath(); g.rect(0,0,w,H); g.rect(W-w,0,w,H); g.clip();
+    for(let i=-2;i<8;i++){g.beginPath(); g.moveTo(i*120,H); g.lineTo(i*120+180,0); g.stroke();}
+    g.restore();
+    g.fillStyle='rgba(200,230,250,.5)'; g.font='600 11px "IBM Plex Mono", monospace';
+    if(w>60){g.fillText('GLASS DOOR G-1',w-112,H-14); g.fillText('GLASS DOOR G-2',W-w+10,H-14);}
+  }
+  // overlays
+  if(S.melt){ g.fillStyle=`rgba(255,30,30,${.12+.12*Math.sin(t*9)})`; g.fillRect(0,0,W,H); }
+  else if(r.main&&(r.temp>85||r.stability<35)){ g.fillStyle=`rgba(255,170,40,${.06+.05*Math.sin(t*6)})`; g.fillRect(0,0,W,H); }
+  g.fillStyle='rgba(200,220,235,.75)'; g.font='600 12px "IBM Plex Mono", monospace';
+  g.fillText('REACTOR CHAMBER · CAM-R1',14,H-14);
+  g.textAlign='right'; g.fillText(`${Math.round(r.out)} MW`,W-14,22); g.textAlign='left';
+}
+
+/* ---------------- main loop ---------------- */
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  if(screen==='game'&&S&&!S.ended){
+    update(dt);
+    if(!S.ended){
+      placeYou();
+      hudT-=dt; if(hudT<=0){hudT=.1; hud();}
+      if(S.loc==='main'&&!S.travel) drawChamber(now/1000);
+      const gm=$('#game');
+      if(S.melt&&save.settings.shake&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const a=2+3*(1-S.melt.t/S.melt.total);gm.style.transform=`translate(${(Math.random()-.5)*a}px,${(Math.random()-.5)*a}px)`;}
+      else gm.style.transform='';
+    }
+  }
+  requestAnimationFrame(frame);
+}
+updateCoins(); show('menu'); requestAnimationFrame(frame);
+})();
+</script>
+
+</html>
