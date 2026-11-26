@@ -98,11 +98,15 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
 .hud .hv{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .hud .spacer{flex:1}
 .pill{font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border:1px solid currentColor;letter-spacing:.06em}
-.st-off{color:var(--dim)} .st-on{color:var(--green)} .st-warn{color:var(--amber)} .st-melt{color:var(--red)} .st-shut{color:var(--amber)}
+.st-off{color:var(--dim)} .st-on{color:var(--green)} .st-warn{color:var(--amber)} .st-melt{color:var(--red)} .st-freeze{color:#9fe8ff} .st-burn{color:#ffb547} .st-shut{color:var(--amber)}
 .hud-menu{background:none;border:1px solid var(--line);padding:6px 12px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em}
 .melt-banner{background:repeating-linear-gradient(135deg,#3a0b0d 0 18px,#250709 18px 36px);border:1px solid var(--red);padding:10px 14px;display:flex;gap:12px 20px;align-items:center;flex-wrap:wrap}
 .melt-banner b{font-family:var(--display);font-size:22px;color:#ffd0d0;letter-spacing:.06em}
 .melt-banner .count{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--red);font-variant-numeric:tabular-nums}
+.melt-banner.freezedown{background:repeating-linear-gradient(135deg,#0b2a3a 0 18px,#071c28 18px 36px);border-color:#9fe8ff}
+.melt-banner.freezedown b{color:#e2f8ff} .melt-banner.freezedown .count{color:#9fe8ff} .melt-banner.freezedown p{color:#cdefff}
+.melt-banner.burndown{background:repeating-linear-gradient(135deg,#3a2508 0 18px,#251705 18px 36px);border-color:#ffb547}
+.melt-banner.burndown b{color:#ffe7c2} .melt-banner.burndown .count{color:#ffb547} .melt-banner.burndown p{color:#ffe0b8}
 .melt-banner p{margin:0;color:#ffc9c9;flex:1;min-width:200px}
 .game-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
 @media (max-width:900px){.game-grid{grid-template-columns:minmax(0,1fr)}}
@@ -197,6 +201,25 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
 .stat{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:center;font-size:12px;color:var(--dim)}
 .stat i{height:6px;background:#0a1116;display:block;position:relative}
 .stat i b{position:absolute;inset:0 auto 0 0;background:var(--amber)}
+
+/* ESDP room */
+.esdp{margin-top:14px;border:1px solid #9b5cff66;background:#150f20;padding:14px;display:flex;flex-direction:column;gap:10px}
+.esdp .subh{margin:0;color:#c9a8ff}
+.esdp-grid{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:560px){.esdp-grid{grid-template-columns:minmax(0,1fr)}}
+.esdp-core{display:flex;gap:14px;align-items:center}
+.orb{width:68px;height:68px;border-radius:50%;flex:none;background:radial-gradient(circle at 40% 35%,#e9dcff,#7a3cff 60%,#2a1050);box-shadow:0 0 18px #7a3cff55}
+.orb.armed{animation:pulse 1.6s ease-in-out infinite;box-shadow:0 0 26px #9b5cff}
+.orb.live{background:radial-gradient(circle at 40% 35%,#fff,#ff3cbe 55%,#5a0a3a);animation:pulse .5s ease-in-out infinite;box-shadow:0 0 34px #ff3cbe}
+.esdp-core .gl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.esdp-core b{display:block;font-family:var(--mono);font-size:18px;color:#e2d0ff}
+.esdp-core span.ch{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.esdp p{margin:0 0 10px;color:var(--dim);font-size:13px;max-width:60ch}
+.esdp .btns{display:flex;gap:8px;flex-wrap:wrap}
+.esdp .pbtn{min-width:200px}
+.melt-banner.esdp{background:repeating-linear-gradient(135deg,#2a0b30 0 18px,#1b0720 18px 36px);border-color:#ff3cbe}
+.melt-banner.esdp b{color:#ffd6f2} .melt-banner.esdp .count{color:#ff6fd0} .melt-banner.esdp p{color:#ffd1ef}
+.st-esdp{color:#ff6fd0}
 
 /* achievements */
 .ach-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
@@ -325,7 +348,7 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
     <button class="hud-menu" data-go="menu">Menu</button>
   </div>
   <div class="melt-banner" id="meltBanner" hidden>
-    <b>MELTDOWN</b><span class="count" id="meltCount">0.0</span>
+    <b id="meltTitle">MELTDOWN</b><span class="count" id="meltCount">0.0</span>
     <p id="meltText">Get to the Surface Section now.</p>
   </div>
   <div class="game-grid">
@@ -335,6 +358,19 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
       <div id="travelBox" class="travel" hidden><div id="travelTxt"></div><div class="bar"><i id="travelBar"></i></div></div>
       <div class="routes" id="routes"></div>
       <div class="sec-actions" id="secActions"></div>
+      <div class="esdp" id="esdpRoom" hidden>
+        <div class="subh">ESDP Main Control Room · Section Epsilon</div>
+        <div class="esdp-grid">
+          <div class="esdp-core"><div class="orb" id="esdpOrb"></div><div><span class="gl">ESDP core</span><b id="esdpState">STANDBY</b><span class="ch" id="esdpCharge">Charge 0%</span></div></div>
+          <div>
+            <p>The emergency self-destruction protocol has its own core, separate from the main reactor. Once activated, the ESDP core explodes in 2 minutes and destroys the whole facility. It cannot be stopped.</p>
+            <div class="btns">
+              <button class="pbtn" id="esdpArm"><span class="lamp"></span><span class="pl">Arm ESDP</span><span class="ps">turn the arming key</span></button>
+              <button class="pbtn emerg" id="esdpGo"><span class="lamp"></span><span class="pl">Activate ESDP</span><span class="ps">arm it first</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="cr" id="controlRoom" hidden>
         <div class="subh" style="margin:6px 0 0">Main Control Room · view into the reactor chamber</div>
@@ -364,6 +400,7 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
           <span>Containment</span><b id="mCont">OFF</b>
           <span>Lasers</span><b id="mLas">RETRACTED</b>
           <span>Glass doors</span><b id="mGlass">OPEN</b>
+          <span>Coolant</span><b id="mCool">ON</b>
         </div>
       </div>
       <div class="box">
@@ -405,7 +442,7 @@ const SHOP=[
  {id:'core_void',cat:'Reactor core',slot:'core',name:'Void Core',price:250,desc:'A dark core with a purple edge.',core:{a:'#1a0b33',b:'#9b5cff'}},
  {id:'up_shoes',cat:'Upgrades',slot:null,name:'Running Shoes',price:120,desc:'Move between sections 30% faster.'},
  {id:'up_coolant',cat:'Upgrades',slot:null,name:'Coolant Upgrade',price:150,desc:'The reactor runs about 240 °C cooler.'},
- {id:'up_shield',cat:'Upgrades',slot:null,name:'Reinforced Bulkheads',price:140,desc:'+15 seconds to escape during a meltdown.'},
+ {id:'up_shield',cat:'Upgrades',slot:null,name:'Reinforced Bulkheads',price:140,desc:'+15 seconds to escape during a meltdown or freezedown.'},
 ];
 const item=id=>SHOP.find(s=>s.id===id);
 const laserColors=()=>(item(save.equip.laser)||SHOP[0]).colors;
@@ -416,9 +453,13 @@ const ACH=[
  {id:'startup',icon:'⏻',name:'Main Startup Success',desc:'Start the main reactor with every step of the startup order done.'},
  {id:'meltdown',icon:'☢',name:'The Meltdown',desc:'Let the main reactor go into meltdown.'},
  {id:'shutdown',icon:'■',name:'Emergency Shutdown Success',desc:'Finish an emergency shutdown and keep the reactor safe.'},
- {id:'surface',icon:'↑',name:'Surface Escape',desc:'Survive a meltdown by reaching the Surface Section.'},
- {id:'bunkerB',icon:'β',name:'Bunker Beta Escape',desc:'Survive a meltdown inside Emergency Bunker Beta.'},
- {id:'bunkerA',icon:'α',name:'Bunker Alpha Escape',desc:'Survive a meltdown inside Emergency Bunker Alpha.'},
+ {id:'surface',icon:'↑',name:'Surface Escape',desc:'Survive a meltdown, freezedown or ESDP by reaching the Surface Section.'},
+ {id:'bunkerB',icon:'β',name:'Bunker Beta Escape',desc:'Survive a meltdown, freezedown or ESDP inside Emergency Bunker Beta.'},
+ {id:'bunkerA',icon:'α',name:'Bunker Alpha Escape',desc:'Survive a meltdown, freezedown or ESDP inside Emergency Bunker Alpha.'},
+ {id:'freezedown',icon:'❄',name:'The Freezedown',desc:'Let the core freeze below −165 °C.'},
+ {id:'burndown',icon:'✹',name:'The Burndown',desc:'Let the core burn past 6,000 °C.'},
+ {id:'esdp',icon:'Ω',name:'Self-Destruct',desc:'Activate the emergency self-destruction protocol (ESDP).'},
+ {id:'heli',icon:'H',name:'Helicopter Escape',desc:'Escape a burndown on the evacuation helicopter.'},
 ];
 let toastTimer=0;
 function unlock(id){
@@ -446,7 +487,7 @@ const SECTIONS={
  bunkerA:{name:'Emergency Bunker Alpha',tag:'Sector D · shelter',x:250,y:240,links:['D'],bunker:true,desc:'A blast-proof shelter behind a meter-thick steel door, with air tanks, water and bunk beds. If the reactor melts down, you can survive in here.'},
  bunkerB:{name:'Emergency Bunker Beta',tag:'Sector B · shelter',x:60,y:186,links:['B'],bunker:true,desc:'A blast-proof shelter dug into the rock under the laser labs. Thick walls, emergency lights and supplies for a long wait. If the reactor melts down, you can survive in here.'},
  zero:{name:'Section Zero',tag:'Level −4',x:150,y:234,links:['B','D','epsilon'],desc:'The old first-generation test chamber, sealed since the early days of the facility.'},
- epsilon:{name:'Section Epsilon',tag:'Level −5',x:150,y:284,links:['zero','main'],desc:'Power distribution hub. Thick cables carry energy from the reactor to the whole facility.'},
+ epsilon:{name:'Section Epsilon',tag:'Level −5',x:150,y:284,links:['zero','main'],desc:'Power distribution hub. Thick cables carry energy from the reactor to the whole facility. Behind a sealed door is the ESDP main control room for the emergency self-destruction protocol.'},
  main:{name:'Main Section',tag:'Level −6',x:150,y:334,links:['epsilon'],desc:'Home of the main reactor. The Main Control Room looks into the reactor chamber through the glass protection doors.'},
 };
 
@@ -456,7 +497,7 @@ function newShift(){
   S={loc:'main',time:0,travel:null,melt:null,blocked:null,shutdown:null,ended:false,earned:0,frac:0,
      surgeIn:30+Math.random()*25,search:{},warnBeep:0,alarm:0,logs:[],
      r:{contain:false,main:false,glass:false,ext:false,energy:false,stab:false,power:false,
-        contA:0,extA:0,glassA:0,temp:20,stability:100,out:0}};
+        pumps:true,od:false,contA:0,extA:0,glassA:0,temp:20,stability:100,out:0}};
   log('Shift started. You are in the Main Control Room.','info');
   renderSection(); buildMap();
 }
@@ -596,6 +637,7 @@ function go(to){
   if(to===S.loc) return;
   if(!SECTIONS[S.loc].links.includes(to)) return;
   if(S.blocked===to){log(`The way into ${SECTIONS[to].name} has collapsed. Find another route.`,'err');return;}
+  if(S.loc==='surface'){ S.pad=false; S.padGo=0; }
   const dur=(S.melt?4:2.5)*(has('up_shoes')?.7:1);
   S.travel={to,t:0,dur}; beep(440,.06,'triangle',.08);
   renderSection();
@@ -603,7 +645,11 @@ function go(to){
 function arrive(){
   S.loc=S.travel.to; S.travel=null; beep(620,.06,'triangle',.08);
   renderSection();
-  if(S.melt && isSafe(S.loc)) endShift(true);
+  if(S.melt && isSafe(S.loc)){
+    if(S.melt.type!=='burndown') endShift(true);
+    else if(SECTIONS[S.loc].bunker) log('The bunker doors will not hold against a burndown! Get to the main helipads in the Surface Section!','err');
+    else log('Surface Section reached. Get to the main helipads!','warn');
+  }
 }
 
 /* ---------------- section panel ---------------- */
@@ -619,10 +665,17 @@ function renderSection(){
   $('#routes').innerHTML=S.travel?'':s.links.slice().sort((a,b)=>rank(a)-rank(b)).map(l=>{
     const col=S.blocked===l, bunk=!!SECTIONS[l].bunker, up=!bunk&&order.indexOf(l)<order.indexOf(S.loc);
     const icon=col?'✕ ':bunk?'▣ ':up?'↑ ':'↓ ';
-    return `<button class="route ${col?'collapsed':''} ${(up||bunk)&&S.melt?'up':''}" data-to="${l}">${icon}${SECTIONS[l].name}${col?' (collapsed)':''}</button>`;}).join('');
+    return `<button class="route ${col?'collapsed':''} ${S.melt&&(up||(bunk&&S.melt.type!=='burndown'))?'up':''}" data-to="${l}">${icon}${SECTIONS[l].name}${col?' (collapsed)':''}</button>`;}).join('');
   let acts='';
   if(!S.travel && S.loc!=='main' && S.loc!=='surface' && !S.melt) acts+=`<button class="act" id="searchBtn">Search for supplies</button>`;
   if(!S.travel && S.loc==='surface' && !S.melt) acts+=`<button class="act" id="endBtn">End shift and go home</button>`;
+  if(!S.travel && S.loc==='epsilon') acts+=`<button class="act" id="esdpRoomBtn" style="border-color:#9b5cff88">${S.esdpRoom?'Leave the ESDP main control room':'Enter the ESDP main control room'}</button>`;
+  if(S.loc!=='epsilon'||S.travel) S.esdpRoom=false;
+  $('#esdpRoom').hidden=!S.esdpRoom; esdpUI();
+  if(!S.travel && S.loc==='surface' && S.melt && S.melt.type==='burndown'){
+    if(!S.pad) acts+=S.padGo>0?`<button class="act" disabled>Heading to the main helipads…</button>`:`<button class="act" id="padBtn">Go to the main helipads</button>`;
+    else acts+=heliState()==='landed'?`<button class="act" id="boardBtn" style="border-color:var(--green);color:var(--green)">Board the evacuation helicopter</button>`:`<button class="act" disabled>Waiting at the main helipads for the helicopter…</button>`;
+  }
   $('#secActions').innerHTML=acts;
   $('#controlRoom').hidden=!(S.loc==='main'&&!S.travel);
   if(S.loc==='main') buildPanel();
@@ -635,6 +688,9 @@ $('#secActions').addEventListener('click',e=>{
     const n=1+Math.floor(Math.random()*4); save.coins+=n; S.earned+=n; persist(); updateCoins();
     S.search[S.loc]=S.time+45; log(`Found ${n} blue coin${n>1?'s':''} in ${SECTIONS[S.loc].name}.`,'good'); beep(880,.08,'triangle',.12); updateSearchBtn();
   }
+  if(e.target.id==='esdpRoomBtn'){ S.esdpRoom=!S.esdpRoom; beep(300,.2,'triangle',.1); if(S.esdpRoom) log('You entered the ESDP main control room.','info'); renderSection(); }
+  if(e.target.id==='padBtn'&&!S.padGo&&!S.pad){ S.padGo=2; log('Running to the main helipads…','info'); renderSection(); }
+  if(e.target.id==='boardBtn'&&S.pad&&heliState()==='landed'){ log('You climbed aboard. The pilots are lifting off!','good'); endShift(true); }
   if(e.target.id==='endBtn'){ S.ended=true; persist(); show('menu'); }
 });
 function updateSearchBtn(){
@@ -642,6 +698,33 @@ function updateSearchBtn(){
   const left=Math.ceil((S.search[S.loc]||0)-S.time);
   b.disabled=left>0; b.textContent=left>0?`Searched · again in ${left}s`:'Search for supplies';
 }
+
+/* ---------------- ESDP ---------------- */
+function esdpUI(){
+  if(!S||$('#esdpRoom').hidden) return;
+  const live=S.melt&&S.melt.type==='esdp';
+  $('#esdpOrb').className='orb'+(live?' live':S.esdpArmed?' armed':'');
+  $('#esdpState').textContent=live?'DETONATING':S.esdpArmed?'ARMED':'STANDBY';
+  $('#esdpCharge').textContent=live?`Charge ${Math.round((1-S.melt.t/S.melt.total)*100)}% · explodes in ${fmtT(Math.ceil(S.melt.t))}`:'Charge 0%';
+  const arm=$('#esdpArm'), go=$('#esdpGo');
+  arm.classList.toggle('lit',!!S.esdpArmed||live); arm.style.setProperty('--lampc','#9b5cff');
+  arm.querySelector('.pl').textContent=S.esdpArmed||live?'Disarm ESDP':'Arm ESDP';
+  arm.querySelector('.ps').textContent=live?'locked':S.esdpArmed?'arming key turned':'turn the arming key';
+  go.classList.toggle('lit',live);
+  go.querySelector('.ps').textContent=live?'activated · cannot be stopped':S.esdpArmed?'ready':'arm it first';
+  go.classList.toggle('blocked',!S.esdpArmed&&!live);
+}
+$('#esdpArm').onclick=()=>{
+  if(S.melt){ log(S.melt.type==='esdp'?'The ESDP is active. The arming key is locked.':'The ESDP is locked during an emergency. Evacuate!','err'); return; }
+  S.esdpArmed=!S.esdpArmed; log(S.esdpArmed?'ESDP armed. Press Activate ESDP to start the self-destruct.':'ESDP disarmed.',S.esdpArmed?'warn':'info');
+  beep(S.esdpArmed?520:260,.25,'square',.1); esdpUI();
+};
+$('#esdpGo').onclick=()=>{
+  if(S.melt){ log(S.melt.type==='esdp'?'The ESDP is already active. Evacuate!':'The ESDP is locked during an emergency. Evacuate!','err'); return; }
+  if(!S.esdpArmed){ log('Arm the ESDP first.','err'); return; }
+  startEvent('esdp','the emergency self-destruction protocol was activated. The ESDP core explodes in 2 minutes.');
+  beep(200,.8,'sawtooth',.15); esdpUI();
+};
 
 /* ---------------- control panel ---------------- */
 const BTNS=[
@@ -651,6 +734,8 @@ const BTNS=[
  {id:'energy',label:()=>'Energy lasers · upper / lower',on:r=>r.energy,c:()=>laserColors().energy,laser:true},
  {id:'power',label:()=>'Power lasers · corners',on:r=>r.power,c:()=>laserColors().power,laser:true},
  {id:'glass',label:r=>r.glass?'Open glass protection doors':'Close glass protection doors',on:r=>r.glass,c:'#9fd3ff',sub:r=>r.glassA>=1?'closed':r.glassA<=0?'open':(r.glass?'closing…':'opening…')},
+ {id:'pumps',label:()=>'Coolant pumps',on:r=>r.pumps,c:'#4fd8ff'},
+ {id:'od',label:()=>'Coolant overdrive',on:r=>r.od,c:'#b8f0ff',sub:r=>r.pumps?(r.od?'ON · cooling fast':'OFF'):'needs coolant pumps'},
  {id:'main',label:r=>r.main?'Main power down':'Main startup',on:r=>r.main,c:'#5fe39a'},
  {id:'emerg',label:()=>'Emergency shutdown',on:()=>!!S.shutdown,c:'#ff4d4d'},
 ];
@@ -671,7 +756,7 @@ function updatePanel(){
     const ps=el.querySelector('.ps'); if(ps.textContent!==sub) ps.textContent=sub;
     el.classList.toggle('blocked',!!(S.melt||S.shutdown) && b.id!=='emerg' || (b.laser&&!(r.ext&&r.extA>=1)));
   }
-  const ck=[['Containment field online',r.contain&&r.contA>=1],['All lasers extended',r.ext&&r.extA>=1],['Stabilization lasers on',r.stab],['Energy lasers on',r.energy],['Power lasers on',r.power],['Glass protection doors closed',r.glass&&r.glassA>=1],['Main startup',r.main]];
+  const ck=[['Coolant pumps running',r.pumps],['Containment field online',r.contain&&r.contA>=1],['All lasers extended',r.ext&&r.extA>=1],['Stabilization lasers on',r.stab],['Energy lasers on',r.energy],['Power lasers on',r.power],['Glass protection doors closed',r.glass&&r.glassA>=1],['Main startup',r.main]];
   $('#checkWrap').hidden=!save.settings.checklist;
   const html=ck.map(([t,ok])=>`<li class="${ok?'ok':''}">${t}</li>`).join('');
   if($('#checklist').innerHTML!==html) $('#checklist').innerHTML=html;
@@ -679,7 +764,7 @@ function updatePanel(){
 $('#panel').addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(b) act(b.dataset.act);});
 function act(id){
   const r=S.r;
-  if(S.melt){ log(id==='emerg'?'Emergency shutdown failed. The meltdown cannot be stopped. Evacuate!':'Controls are not responding. Evacuate to the surface!','err'); return; }
+  if(S.melt){ log(id==='emerg'?`Emergency shutdown failed. The ${S.melt.type==='esdp'?'ESDP':S.melt.type} cannot be stopped. Evacuate!`:'Controls are not responding. Evacuate!','err'); return; }
   if(S.shutdown && id!=='emerg'){ log('Emergency shutdown in progress. Controls are locked.','warn'); return; }
   switch(id){
     case 'contain':
@@ -709,9 +794,18 @@ function act(id){
       if(r[id] && id==='power' && !r.stab) log('Power lasers on without stabilization lasers! Stability dropping!','err');
       else log(`${names[id]} ${r[id]?'on':'off'}.`, 'info');
       beep(r[id]?900:500,.1,'square',.1); break; }
+    case 'pumps':
+      r.pumps=!r.pumps;
+      if(!r.pumps){ r.od=false; log(r.main?'Coolant pumps stopped while the reactor is running! The core will overheat!':'Coolant pumps stopped.',r.main?'err':'info'); }
+      else log('Coolant pumps running.','info');
+      beep(r.pumps?400:200,.25,'triangle',.12); break;
+    case 'od':
+      if(!r.pumps){ log('Coolant overdrive needs the coolant pumps running.','err'); return; }
+      r.od=!r.od; log(r.od?'Coolant overdrive on. The core is cooling fast — do not let it freeze.':'Coolant overdrive off.',r.od?'warn':'info');
+      beep(r.od?1200:600,.2,'sine',.12); break;
     case 'emerg':
       if(S.shutdown) return;
-      S.shutdown={t:8}; r.energy=r.stab=r.power=false; r.ext=false; r.main=false; r.glass=true;
+      S.shutdown={t:8}; r.od=false; r.energy=r.stab=r.power=false; r.ext=false; r.main=false; r.glass=true;
       log('EMERGENCY SHUTDOWN. All lasers off, reactor scramming, glass doors closing.','warn');
       beep(500,.3,'sawtooth',.15); beep(350,.3,'sawtooth',.15,.3); beep(250,.4,'sawtooth',.15,.6); break;
   }
@@ -720,15 +814,39 @@ function act(id){
 
 /* ---------------- simulation ---------------- */
 function approach(v,t,rate,dt){ return v<t?Math.min(t,v+rate*dt):Math.max(t,v-rate*dt); }
-function startMeltdown(reason){
-  const r=S.r; const total=45+(has('up_shield')?15:0);
-  S.melt={t:total,total}; S.blocked=Math.random()<.5?'B':'D'; S.shutdown=null;
-  log(`MELTDOWN: ${reason}`,'err'); unlock('meltdown');
-  log(`Debris has blocked ${SECTIONS[S.blocked].name}. Find another way up!`,'err');
-  const lost=S.blocked==='B'?'Emergency Bunker Beta':'Emergency Bunker Alpha';
-  $('#meltText').textContent=`Get to the Surface Section or an emergency bunker! ${SECTIONS[S.blocked].name} has collapsed, so ${lost} is cut off — use another route.`;
-  renderSection();
-  if(isSafe(S.loc)) endShift(true);
+const EVENTS={
+ meltdown:{name:'MELTDOWN',cls:'st-melt'},
+ freezedown:{name:'FREEZEDOWN',cls:'st-freeze'},
+ burndown:{name:'BURNDOWN',cls:'st-burn'},
+ esdp:{name:'ESDP',cls:'st-esdp'},
+};
+const HELI_ARRIVE=30, HELI_STAY=30;
+function heliState(){ if(!S.melt||S.melt.type!=='burndown') return null; return (S.melt.total-S.melt.t)<HELI_ARRIVE?'coming':'landed'; }
+function startEvent(type,reason){
+  const total=type==='burndown'?HELI_ARRIVE+HELI_STAY:type==='esdp'?120:45+(has('up_shield')?15:0);
+  S.melt={type,t:total,total}; S.blocked=type==='esdp'?null:Math.random()<.5?'B':'D'; S.shutdown=null; S.pad=false; S.padGo=0;
+  log(`${EVENTS[type].name}: ${reason}`,'err'); unlock(type);
+  if(S.blocked) log(`Debris has blocked ${SECTIONS[S.blocked].name}. Find another way!`,'err');
+  if(type==='burndown') log('A C.A.M. emergency evacuation helicopter is on its way to the main helipads. It lands in 30 seconds.','warn');
+  $('#meltBanner').className='melt-banner '+type;
+  $('#meltTitle').textContent=EVENTS[type].name;
+  eventText(); renderSection();
+  if(type!=='burndown' && isSafe(S.loc)) endShift(true);
+}
+function eventText(){
+  if(!S.melt) return;
+  const m=S.melt; let txt;
+  if(m.type==='burndown'){
+    txt=heliState()==='coming'
+      ?`Get to the main helipads in the Surface Section! The evacuation helicopter lands in ${Math.ceil(m.t-HELI_STAY)}s. The bunkers will not survive a burndown. ${SECTIONS[S.blocked].name} has collapsed.`
+      :`The evacuation helicopter is on the main helipads! It leaves in ${Math.ceil(m.t)}s — board it now.`;
+  } else if(m.type==='esdp'){
+    txt=`The ESDP core explodes in ${fmtT(Math.ceil(m.t))}. Get to the Surface Section or an emergency bunker!`;
+  } else {
+    const lost=S.blocked==='B'?'Emergency Bunker Beta':'Emergency Bunker Alpha';
+    txt=`${m.type==='freezedown'?'The core is freezing solid. ':''}Get to the Surface Section or an emergency bunker! ${SECTIONS[S.blocked].name} has collapsed, so ${lost} is cut off — use another route.`;
+  }
+  const el=$('#meltText'); if(el.textContent!==txt) el.textContent=txt;
 }
 function update(dt){
   const r=S.r; S.time+=dt;
@@ -737,51 +855,85 @@ function update(dt){
   r.glassA=approach(r.glassA,r.glass?1:0,.7,dt);
   const ready=r.extA>=1;
   const E=r.energy&&ready, ST=r.stab&&ready, P=r.power&&ready;
-  const cont=r.contA, glassOpen=r.glassA<1;
+  const cont=r.contA, glassOpen=r.glassA<1, od=r.pumps&&r.od;
   if(S.melt){
-    r.temp=Math.min(160,r.temp+1.4*dt); r.stability=approach(r.stability,0,20,dt); r.out=approach(r.out,0,300,dt);
+    const ty=S.melt.type;
+    if(ty==='freezedown') r.temp=Math.max(-12,r.temp-.6*dt);
+    else if(ty==='burndown') r.temp=Math.min(260,r.temp+1.5*dt);
+    else if(ty==='meltdown') r.temp=Math.min(160,r.temp+1.4*dt);
+    if(ty!=='esdp'){ r.stability=approach(r.stability,0,20,dt); r.out=approach(r.out,0,300,dt); }
+    const before=heliState();
     S.melt.t-=dt;
-    S.alarm-=dt; if(S.alarm<=0){S.alarm=.9; beep(880,.35,'sawtooth',.12); beep(620,.35,'sawtooth',.12,.42);}
-    if(S.melt.t<=0){ S.melt.t=0; endShift(false); return; }
+    if(before==='coming'&&heliState()==='landed'){ log('The evacuation helicopter has landed on the main helipads. Two pilots are waiting. It leaves in 30 seconds!','good'); beep(120,.6,'sawtooth',.12); renderSection(); }
+    if(S.padGo>0){ S.padGo-=dt; if(S.padGo<=0){ S.padGo=0; S.pad=true; log('You are at the main helipads.','info'); renderSection(); } }
+    S.alarm-=dt;
+    if(S.alarm<=0){ S.alarm=.9;
+      if(ty==='freezedown'){ beep(1500,.3,'sine',.1); beep(1900,.3,'sine',.1,.4); }
+      else if(ty==='burndown'){ beep(300,.4,'sawtooth',.12); beep(220,.4,'sawtooth',.12,.45); }
+      else if(ty==='esdp'){ S.alarm=1.2; beep(660,.45,'square',.09); beep(440,.45,'square',.09,.55); }
+      else { beep(880,.35,'sawtooth',.12); beep(620,.35,'sawtooth',.12,.42); } }
+    if(S.melt.t<=0){ S.melt.t=0; if(ty==='burndown') log('The evacuation helicopter took off without you.','err'); endShift(false); return; }
   } else {
     const cool=has('up_coolant')?8:0;
     let target, stabT;
     if(r.main){
-      target=38+(E?18:0)+(P?32:0)-(ST?12:0)+(glassOpen?8:0)+(1-cont)*35-cool;
-      stabT=100-(P&&!ST?75:0)-(E&&!ST?20:0)-(1-cont)*65-Math.max(0,r.temp-75)*2-(glassOpen?5:0);
-    } else { target=20+((E||P)?4:0); stabT=100; }
+      target=38+(E?18:0)+(P?32:0)-(ST?12:0)+(glassOpen?8:0)+(1-cont)*35-cool+(r.pumps?0:70)-(od?45:0);
+      stabT=100-(P&&!ST?75:0)-(E&&!ST?20:0)-(1-cont)*65-Math.max(0,r.temp-110)*.4-(glassOpen?5:0);
+    } else { target=20+((E||P)?4:0)-(od?45:0); stabT=100; }
     const k=S.shutdown?.14:.06;
-    r.temp+= (target-r.temp)*k*dt + (r.main?(Math.random()-.5)*.6*dt:0);
+    r.temp+= (target-r.temp)*k*dt + (r.main?(Math.random()-.5)*.6*dt:0) + (r.main&&!r.pumps&&r.temp>90?(2+(r.temp-90)*.05)*dt:0);
     r.stability+= (stabT-r.stability)*.08*dt;
-    r.stability=clamp(r.stability,0,100); r.temp=Math.max(15,r.temp);
-    const outT=r.main?(150+(E?600:0)+(P?1400:0))*(r.stability/100)*(.4+.6*cont):0;
+    r.stability=clamp(r.stability,0,100); r.temp=Math.max(-20,r.temp);
+    const outT=r.main?(150+(E?600:0)+(P?1400:0))*(r.stability/100)*(.4+.6*cont)*(od?.65:1):0;
     r.out=approach(r.out,outT,400,dt);
     if(r.main){
       S.surgeIn-=dt;
       if(S.surgeIn<=0){ S.surgeIn=25+Math.random()*30; r.stability-=ST?10:26; r.temp+=6; log('Plasma surge detected in the core.','warn'); }
-      if(r.temp>=100) startMeltdown('core temperature over the limit.');
-      else if(r.stability<=0) startMeltdown('the core lost all stability.');
+      if(r.stability<=0) startEvent('meltdown','the core lost all stability.');
     }
+    if(!S.melt){
+      if(r.temp>=200) startEvent('burndown','the core passed 6,000 °C.');
+      else if(r.temp<=-5.5) startEvent('freezedown','the core fell below −165 °C.');
+    }
+    if(S.melt||S.ended) return;
+    if(r.main&&!r.pumps&&r.temp>100&&!S.hotWarned){ S.hotWarned=true; log('Core overheating! Turn the coolant pumps back on!','err'); }
+    if(r.temp<85) S.hotWarned=false;
+    if(r.temp<4&&!S.coldWarned){ S.coldWarned=true; log('Core is freezing! Turn off coolant overdrive!','err'); }
+    if(r.temp>8) S.coldWarned=false;
     if(S.shutdown){ S.shutdown.t-=dt; if(S.shutdown.t<=0){S.shutdown=null; log('Emergency shutdown complete. The reactor is safe.','good'); unlock('shutdown');} }
     S.frac+=r.out/2200*.8*dt;
     while(S.frac>=1){S.frac-=1; save.coins++; S.earned++; updateCoins();}
-    const warn=r.main&&(r.temp>85||r.stability<35);
-    S.warnBeep-=dt; if(warn&&S.warnBeep<=0){S.warnBeep=1.4; beep(1000,.1,'square',.07);}
+    S.warnBeep-=dt; if(isWarn()&&S.warnBeep<=0){S.warnBeep=1.4; beep(1000,.1,'square',.07);}
   }
   if(S.travel){ S.travel.t+=dt; $('#travelBar').style.width=(S.travel.t/S.travel.dur*100)+'%'; if(S.travel.t>=S.travel.dur) arrive(); }
   saveTimer+=dt; if(saveTimer>3){saveTimer=0;persist();}
   if(humGain&&AC){ const g=r.main||S.melt?(.04+r.out/2200*.07+(S.melt?.05:0)):0; humGain.gain.setTargetAtTime(g,AC.currentTime,.3); humOsc.frequency.setTargetAtTime(S.melt?42+Math.random()*10:55+r.out/2200*20,AC.currentTime,.2); }
 }
+function isWarn(){ const r=S.r; return (r.main&&(r.temp>110||r.stability<35))||r.temp<4; }
+const BLAST={
+  meltdown:{far:'The main reactor detonated far below you.',bunk:'The whole facility shook'},
+  freezedown:{far:'The main reactor burst in a freezing blast far below you and covered the facility in ice.',bunk:'A freezing blast turned the facility to ice'},
+  esdp:{far:'The ESDP core detonated far below you and took the whole facility with it.',bunk:'The ESDP core blast tore through the whole facility'},
+};
 function endShift(ok){
   if(S.ended) return; S.ended=true;
-  const bunker=ok&&SECTIONS[S.loc].bunker;
-  const bonus=ok?(bunker?50:75)+Math.floor(S.melt?S.melt.t:0):0;
+  const ev=S.melt?S.melt.type:'meltdown', left=S.melt?S.melt.t:0;
+  const heli=ok&&ev==='burndown', bunker=ok&&!heli&&!!SECTIONS[S.loc].bunker;
+  const bonus=ok?(heli?100:bunker?50:75)+Math.floor(left):0;
   save.coins+=bonus; persist();
-  if(ok) unlock(S.loc==='surface'?'surface':S.loc);
-  $('#resTitle').textContent=!ok?'Facility lost':bunker?'You survived in the bunker':'You escaped';
-  $('#resText').textContent=!ok?'The main reactor detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker the moment the alarms start.'
-    :bunker?`You sealed yourself inside ${SECTIONS[S.loc].name} with ${S.melt.t.toFixed(1)} seconds to spare. The whole facility shook, but the bunker held. Rescue teams dug you out the next morning.`
-    :`You reached the Surface Section with ${S.melt.t.toFixed(1)} seconds to spare. The main reactor detonated far below you.`;
+  if(ok) unlock(heli?'heli':S.loc==='surface'?'surface':S.loc);
+  const fail={
+    meltdown:['Facility lost','The main reactor detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker the moment the alarms start.'],
+    freezedown:['Frozen solid','The main reactor burst in a freezing blast before you reached safety. Next time, run for the Surface Section or an emergency bunker as soon as the frost alarms start.'],
+    esdp:['Self-destructed','The ESDP core detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker right after you activate the ESDP.'],
+    burndown:['Burned down','The evacuation helicopter left the main helipads without you, and the core burned through the facility. Next time, head straight for the helipads in the Surface Section.'],
+  }[ev];
+  const b=BLAST[ev]||BLAST.meltdown;
+  $('#resTitle').textContent=!ok?fail[0]:heli?'You flew out':bunker?'You survived in the bunker':'You escaped';
+  $('#resText').textContent=!ok?fail[1]
+    :heli?`You boarded the C.A.M. emergency evacuation helicopter with ${left.toFixed(1)} seconds to spare. The two pilots lifted off as the core burned through the facility below.`
+    :bunker?`You sealed yourself inside ${SECTIONS[S.loc].name} with ${left.toFixed(1)} seconds to spare. ${b.bunk}, but the bunker held. Rescue teams dug you out the next morning.`
+    :`You reached the Surface Section with ${left.toFixed(1)} seconds to spare. ${b.far}`;
   $('#resTime').textContent=fmtT(S.time); $('#resEarned').textContent=S.earned; $('#resBonus').textContent=bonus;
   if(humGain) humGain.gain.value=0;
   ok?(beep(523,.15,'triangle',.15),beep(659,.15,'triangle',.15,.15),beep(784,.3,'triangle',.15,.3)):beep(90,1.2,'sawtooth',.2);
@@ -796,11 +948,15 @@ function hud(){
   $('#hTemp').textContent=tC.toLocaleString('en-US')+' °C';
   $('#hStab').textContent=Math.round(r.stability)+'%';
   $('#hOut').textContent=Math.round(r.out).toLocaleString('en-US')+' MW';
-  const warn=r.main&&(r.temp>85||r.stability<35);
-  const st=S.melt?['MELTDOWN','st-melt']:S.shutdown?['EMERGENCY SHUTDOWN','st-shut']:!r.main?['OFFLINE','st-off']:warn?['WARNING','st-warn']:['ONLINE','st-on'];
+  const warn=isWarn();
+  const st=S.melt?[EVENTS[S.melt.type].name,EVENTS[S.melt.type].cls]:S.shutdown?['EMERGENCY SHUTDOWN','st-shut']:!r.main?['OFFLINE','st-off']:warn?['WARNING','st-warn']:['ONLINE','st-on'];
   const p=$('#hStatus'); p.textContent=st[0]; p.className='pill '+st[1];
   $('#meltBanner').hidden=!S.melt;
-  if(S.melt) $('#meltCount').textContent=S.melt.t.toFixed(1)+'s';
+  if(S.melt){ const hs=heliState();
+    $('#meltCount').textContent=S.melt.type==='esdp'?fmtT(Math.ceil(S.melt.t)):hs==='coming'?`lands in ${(S.melt.t-HELI_STAY).toFixed(1)}s`:hs==='landed'?`leaves in ${S.melt.t.toFixed(1)}s`:S.melt.t.toFixed(1)+'s';
+    eventText(); }
+  esdpUI();
+  $('#mCool').textContent=r.pumps?(r.od?'OVERDRIVE':'ON'):'OFF';
   $('#mMain').textContent=r.main?'ON':'OFF';
   $('#mCont').textContent=r.contain?Math.round(r.contA*100)+'%':'OFF';
   $('#mLas').textContent=r.extA>=1?(r.ext?'EXTENDED':'RETRACTED'):r.extA>0?'MOVING':'RETRACTED';
@@ -811,7 +967,7 @@ function hud(){
     $('#gCont').textContent=Math.round(r.contA*100)+'%';
     $('#gOut').textContent=Math.round(r.out).toLocaleString('en-US')+' MW';
     const bar=(id,v,c)=>{const e=$(id);e.style.width=clamp(v,0,100)+'%';e.style.background=c;};
-    bar('#gbTemp',r.temp,r.temp>85?'var(--red)':r.temp>70?'var(--amber)':'var(--cyan)');
+    bar('#gbTemp',(r.temp+10)/210*100,r.temp<4?'#b8f0ff':r.temp>110?'var(--red)':r.temp>85?'var(--amber)':'var(--cyan)');
     bar('#gbStab',r.stability,r.stability<35?'var(--red)':r.stability<60?'var(--amber)':'var(--green)');
     bar('#gbCont',r.contA*100,'var(--cyan)');
     bar('#gbOut',r.out/2200*100,'var(--coin)');
@@ -905,8 +1061,12 @@ function drawChamber(t){
     if(w>60){g.fillText('GLASS DOOR G-1',w-112,H-14); g.fillText('GLASS DOOR G-2',W-w+10,H-14);}
   }
   // overlays
-  if(S.melt){ g.fillStyle=`rgba(255,30,30,${.12+.12*Math.sin(t*9)})`; g.fillRect(0,0,W,H); }
-  else if(r.main&&(r.temp>85||r.stability<35)){ g.fillStyle=`rgba(255,170,40,${.06+.05*Math.sin(t*6)})`; g.fillRect(0,0,W,H); }
+  if(r.temp<10){ const f=clamp((10-r.temp)/20,0,1); g.fillStyle=`rgba(190,235,255,${.28*f})`; g.fillRect(0,0,W,H);
+    g.strokeStyle=`rgba(230,248,255,${.5*f})`; g.lineWidth=1.5;
+    for(let i=0;i<14;i++){ const fx=(i*97)%W, fy=(i*53)%H; g.beginPath(); for(let k=0;k<3;k++){ g.moveTo(fx,fy); g.lineTo(fx+Math.cos(k*2.1)*18*f,fy+Math.sin(k*2.1)*18*f);} g.stroke(); } }
+  if(S.melt){ const col=S.melt.type==='freezedown'?'160,225,255':S.melt.type==='burndown'?'255,190,60':S.melt.type==='esdp'?'255,60,190':'255,30,30';
+    g.fillStyle=`rgba(${col},${.12+.12*Math.sin(t*9)})`; g.fillRect(0,0,W,H); }
+  else if(isWarn()){ g.fillStyle=`rgba(255,170,40,${.06+.05*Math.sin(t*6)})`; g.fillRect(0,0,W,H); }
   g.fillStyle='rgba(200,220,235,.75)'; g.font='600 12px "IBM Plex Mono", monospace';
   g.fillText('REACTOR CHAMBER · CAM-R1',14,H-14);
   g.textAlign='right'; g.fillText(`${Math.round(r.out)} MW`,W-14,22); g.textAlign='left';
@@ -930,21 +1090,23 @@ function boom(){
   src.connect(lp); lp.connect(gn); gn.connect(master); src.start();
 }
 function startAftermath(){
-  const surf=S.loc==='surface';
-  AF={kind:surf?'surface':'bunker',bunker:surf?null:SECTIONS[S.loc].name,t:0,phase:surf?'walk':'pick',uiPhase:null,
+  const ev=S.melt?S.melt.type:'meltdown', heli=ev==='burndown', surf=!heli&&S.loc==='surface';
+  AF={kind:heli?'heli':surf?'surface':'bunker',cold:ev==='freezedown',lift:0,bunker:surf?null:SECTIONS[S.loc].name,t:0,phase:surf?'walk':'pick',uiPhase:null,
       fade:0,endT:0,shake:surf?1:0,parts:[],smoke:[],hold:null,stepT:0,
-      px:60,walkCycle:0,gate:0,
+      px:heli?60:60,walkCycle:0,gate:0,
       stars:Array.from({length:60},()=>({x:Math.random()*720,y:Math.random()*100,s:Math.random()*1.5+.3})),
       dots:Array.from({length:140},()=>({x:Math.random()*720,y:GROUND_Y+Math.random()*(440-GROUND_Y),s:Math.random()*2+.5}))};
-  if(!surf){
-    AF.layers=[]; const cols=['#5b4f45','#6d6157','#4a4038','#7a6e62','#665a4f'];
+  if(AF.kind==='bunker'){
+    AF.layers=[]; const cols=AF.cold?['#9fb6c4','#b9cdd8','#7f97a6','#d6e4ec','#8aa3b3']:['#5b4f45','#6d6157','#4a4038','#7a6e62','#665a4f'];
     for(let i=0;i<8;i++){ const rocks=[]; for(let j=0;j<9;j++) rocks.push({x:270+Math.random()*104,y:Math.random()*22,w:16+Math.random()*24,h:10+Math.random()*14,c:cols[(i+j)%5]}); AF.layers.push({hp:3,max:3,rocks}); }
     AF.wheel=0; AF.doorUp=0; AF.sx=540; AF.wx=330; AF.swing=0; AF.digT=0; AF.rescueT=0; AF.crew=null; AF.creakT=0;
   }
-  $('#afTitle').textContent=surf?'The main road':`Rescue at ${AF.bunker}`;
-  $('#afEyebrow').textContent=surf?'Aftermath · Surface escape':'Aftermath · C.A.M. Emergency Rescue Corps';
+  if(heli){ AF.kind='heli'; AF.bunker=null; AF.phase='walk'; AF.shake=1; }
+  const evName={meltdown:'Meltdown',freezedown:'Freezedown',burndown:'Burndown',esdp:'ESDP'}[ev];
+  $('#afTitle').textContent=heli?'The main helipads':surf?'The main road':`Rescue at ${AF.bunker}`;
+  $('#afEyebrow').textContent=heli?'Aftermath · Burndown evacuation':surf?`Aftermath · ${evName} surface escape`:`Aftermath · ${evName} · C.A.M. Emergency Rescue Corps`;
   show('aftermath'); afUI();
-  if(surf) boom();
+  if(surf||heli) boom();
 }
 function finishAf(){ AF=null; keys.walk=keys.act=false; show('result'); }
 $('#afSkip').onclick=()=>finishAf();
@@ -955,7 +1117,8 @@ function afUI(){
   if(pick) $('#crewGrid').innerHTML=CREW.map(c=>`<button class="crew" data-crew="${c.id}"><span class="helm" style="background:${c.helmet}"></span><h4>${c.name}</h4><p>${c.role}</p>
     <span class="stat">Digging<i><b style="width:${c.dig/1.7*100}%"></b></i></span><span class="stat">Doors<i><b style="width:${c.open/1.7*100}%"></b></i></span></button>`).join('');
   const hints={
-    walk:'The reactor is gone. Hold Walk (or the → key) to follow the main road to the main gates.',
+    walk:AF.kind==='heli'?'The core is burning through the facility. Hold Walk (or the → key) to run to the evacuation helicopter.':'The reactor is gone. Hold Walk (or the → key) to follow the main road to the main gates.',
+    liftoff:'You are aboard. The two pilots lift off from the main helipads…',
     pick:`The C.A.M. Emergency Rescue Corps has arrived above ${AF.bunker}. Pick the crew worker you want to play as.`,
     dig:'Tap Dig (or press Space) to clear the rubble down to the bunker doors.',
     walkdoor:'The bunker doors are clear. Walking over to the door wheel…',
@@ -994,11 +1157,20 @@ function updateAf(dt){
   for(const p of a.parts){p.x+=p.vx*dt;p.y+=p.vy*dt;if(!p.ember)p.vy+=420*dt;p.life-=dt;}
   a.parts=a.parts.filter(p=>p.life>0);
   const actHeld=a.hold||(keys.act?(a.phase==='door'?'open':'dig'):null);
-  if(a.kind==='surface'){
+  if(a.kind==='heli'){
+    if(Math.random()<dt*8) a.smoke.push({x:120+Math.random()*80,y:260,r:10+Math.random()*10,vy:-25-Math.random()*25,vx:10+Math.random()*10,a:.6});
+    for(const s of a.smoke){s.y+=s.vy*dt;s.x+=s.vx*dt;s.r+=9*dt;s.a-=.06*dt;}
+    a.smoke=a.smoke.filter(s=>s.a>0);
+    if(Math.random()<dt*6) a.parts.push({x:Math.random()*360,y:300,vx:20+Math.random()*30,vy:-40-Math.random()*40,life:3,c:'#ffd27a',s:1.6,ember:true});
+    if(a.phase==='walk'){
+      if(a.hold==='walk'||keys.walk){ a.px+=130*(has('up_shoes')?1.3:1)*dt; a.walkCycle+=dt; a.stepT-=dt; if(a.stepT<=0){a.stepT=.3; beep(85,.06,'sine',.12);} }
+      if(a.px>=440){ a.phase='liftoff'; afUI(); beep(140,1.5,'sawtooth',.1); }
+    } else if(a.phase==='liftoff'){ a.lift=Math.min(1.6,a.lift+dt*.35); if(a.lift>=1.4){ a.phase='fade'; afUI(); } }
+  } else if(a.kind==='surface'){
     if(Math.random()<dt*8) a.smoke.push({x:160+Math.random()*80,y:250,r:10+Math.random()*10,vy:-18-Math.random()*20,vx:6+Math.random()*8,a:.5});
     for(const s of a.smoke){s.y+=s.vy*dt;s.x+=s.vx*dt;s.r+=8*dt;s.a-=.05*dt;}
     a.smoke=a.smoke.filter(s=>s.a>0);
-    if(Math.random()<dt*3) a.parts.push({x:Math.random()*720,y:-10,vx:20,vy:40+Math.random()*40,life:6,c:'#ff9a3c',s:1.5,ember:true});
+    if(Math.random()<dt*(a.cold?14:3)) a.parts.push({x:Math.random()*720,y:-10,vx:a.cold?8:20,vy:a.cold?25+Math.random()*25:40+Math.random()*40,life:14,c:a.cold?'#f2fbff':'#ff9a3c',s:a.cold?2:1.5,ember:true});
     if(a.phase==='walk'){
       if(a.hold==='walk'||keys.walk){
         a.px+=120*(has('up_shoes')?1.3:1)*dt; a.walkCycle+=dt;
@@ -1009,6 +1181,7 @@ function updateAf(dt){
       if(a.gate>=1&&a.px>=GATE_X+80){ a.phase='fade'; afUI(); }
     }
   } else {
+    if(a.cold&&Math.random()<dt*10) a.parts.push({x:Math.random()*720,y:-10,vx:8,vy:25+Math.random()*25,life:14,c:'#f2fbff',s:2,ember:true});
     a.swing=Math.max(0,a.swing-dt);
     if(a.phase==='dig'){
       if(actHeld==='dig'){ a.digT-=dt; if(a.digT<=0){ dig(); a.digT=.22; } } else a.digT=0;
@@ -1053,18 +1226,22 @@ function drawSurfaceAf(){
   const a=AF, c=ag, cam=clamp(a.px-220,0,ROAD_END+120-720);
   const sx=(Math.random()-.5)*a.shake*14, sy=(Math.random()-.5)*a.shake*10;
   c.setTransform(1,0,0,1,sx,sy);
-  const sky=c.createLinearGradient(0,0,0,330); sky.addColorStop(0,'#140a0d'); sky.addColorStop(.7,'#4a1d12'); sky.addColorStop(1,'#8a3a14');
+  const cold=a.cold;
+  const sky=c.createLinearGradient(0,0,0,330);
+  if(cold){ sky.addColorStop(0,'#0a1220'); sky.addColorStop(.7,'#23465e'); sky.addColorStop(1,'#7fb4cf'); }
+  else { sky.addColorStop(0,'#140a0d'); sky.addColorStop(.7,'#4a1d12'); sky.addColorStop(1,'#8a3a14'); }
   c.fillStyle=sky; c.fillRect(-20,-20,760,360);
   // ruined facility far behind (parallax)
   const fx=40-cam*.25;
-  const glow=c.createRadialGradient(fx+160,300,10,fx+160,300,260); glow.addColorStop(0,'rgba(255,140,40,.55)'); glow.addColorStop(1,'rgba(255,140,40,0)');
+  const glow=c.createRadialGradient(fx+160,300,10,fx+160,300,260); glow.addColorStop(0,cold?'rgba(170,230,255,.6)':'rgba(255,140,40,.55)'); glow.addColorStop(1,cold?'rgba(170,230,255,0)':'rgba(255,140,40,0)');
   c.fillStyle=glow; c.fillRect(-20,0,760,340);
   c.fillStyle='#120c0b';
   [[0,250,70,90],[60,220,50,120],[110,270,120,70],[220,200,26,140],[250,240,90,100],[330,280,60,60]].forEach(([x,y,w,h])=>c.fillRect(fx+x,y,w,h));
-  c.fillStyle=`rgba(255,120,40,${.5+.3*Math.sin(a.t*7)})`; c.fillRect(fx+125,262,40,8); c.fillRect(fx+262,232,30,6);
-  for(const s of a.smoke){ c.fillStyle=`rgba(40,30,30,${s.a})`; c.beginPath(); c.arc(fx+s.x-40,s.y,s.r,0,Math.PI*2); c.fill(); }
+  c.fillStyle=cold?`rgba(200,240,255,${.6+.3*Math.sin(a.t*3)})`:`rgba(255,120,40,${.5+.3*Math.sin(a.t*7)})`; c.fillRect(fx+125,262,40,8); c.fillRect(fx+262,232,30,6);
+  if(cold){ c.fillStyle='rgba(230,248,255,.85)'; [[0,250,70],[60,220,50],[110,270,120],[220,200,26],[250,240,90],[330,280,60]].forEach(([x,y,w])=>c.fillRect(fx+x,y,w,5)); }
+  for(const s of a.smoke){ c.fillStyle=cold?`rgba(225,242,255,${s.a*.7})`:`rgba(40,30,30,${s.a})`; c.beginPath(); c.arc(fx+s.x-40,s.y,s.r,0,Math.PI*2); c.fill(); }
   // ground + road
-  c.fillStyle='#17120f'; c.fillRect(-20,330,760,130);
+  c.fillStyle=cold?'#c9d8e0':'#17120f'; c.fillRect(-20,330,760,130);
   c.fillStyle='#2b2e33'; c.fillRect(-20,352,760,52);
   c.fillStyle='#4a4e55'; c.fillRect(-20,352,760,3); c.fillRect(-20,401,760,3);
   c.fillStyle='#c9c0a0'; for(let x=-(cam%90);x<740;x+=90) c.fillRect(x,377,44,4);
@@ -1092,9 +1269,9 @@ function drawSurfaceAf(){
   drawPerson(a.px-cam,388,{walk:a.walkCycle,body:'#e9eef2',stripe:'#4fd8ff'});
   // embers
   for(const p of a.parts){ c.fillStyle=p.c; c.fillRect(p.x-cam*0,p.y,p.s,p.s); }
-  if(a.t<1){ c.fillStyle=`rgba(255,240,220,${1-a.t})`; c.fillRect(-20,-20,760,480); }
+  if(a.t<1){ c.fillStyle=cold?`rgba(220,245,255,${1-a.t})`:`rgba(255,240,220,${1-a.t})`; c.fillRect(-20,-20,760,480); }
   c.setTransform(1,0,0,1,0,0);
-  fadeOverlay('You walked out through the main gates.','The C.A.M. facility is gone, but you made it.');
+  fadeOverlay('You walked out through the main gates.',cold?'The C.A.M. facility is frozen solid, but you made it.':'The C.A.M. facility is gone, but you made it.');
 }
 function drawBunkerAf(){
   const a=AF, c=ag; const sx=(Math.random()-.5)*a.shake*12;
@@ -1103,14 +1280,14 @@ function drawBunkerAf(){
   c.fillStyle=sky; c.fillRect(-20,0,760,GROUND_Y);
   for(const s of a.stars){ c.fillStyle=`rgba(255,255,255,${.4+.3*Math.sin(a.t*2+s.x)})`; c.fillRect(s.x,s.y,s.s,s.s); }
   // smoldering ruins far away
-  const g=c.createRadialGradient(110,118,4,110,118,120); g.addColorStop(0,'rgba(255,120,40,.4)'); g.addColorStop(1,'rgba(255,120,40,0)');
+  const g=c.createRadialGradient(110,118,4,110,118,120); g.addColorStop(0,a.cold?'rgba(170,230,255,.45)':'rgba(255,120,40,.4)'); g.addColorStop(1,a.cold?'rgba(170,230,255,0)':'rgba(255,120,40,0)');
   c.fillStyle=g; c.fillRect(0,0,260,GROUND_Y);
   c.fillStyle='#0d0c10'; [[40,92,40,24],[78,80,18,36],[96,98,60,18],[156,88,22,28]].forEach(([x,y,w,h])=>c.fillRect(x,y,w,h));
   // underground
   c.fillStyle='#2a221b'; c.fillRect(-20,GROUND_Y,760,330);
   for(const d of a.dots){ c.fillStyle='rgba(0,0,0,.25)'; c.fillRect(d.x,d.y,d.s,d.s); }
   c.fillStyle='#3d3326'; c.fillRect(-20,GROUND_Y-12,760,12);
-  c.fillStyle='#2f3a22'; c.fillRect(-20,GROUND_Y-14,760,3);
+  c.fillStyle=a.cold?'#e6f2f8':'#2f3a22'; c.fillRect(-20,GROUND_Y-14,760,a.cold?6:3);
   // bunker
   c.fillStyle='#6b7175'; c.fillRect(394,258,250,150);
   c.fillStyle='#585e62'; for(let x=400;x<640;x+=30) c.fillRect(x,258,1,150);
@@ -1174,6 +1351,46 @@ function drawBunkerAf(){
   c.setTransform(1,0,0,1,0,0);
   fadeOverlay('Rescue complete.',`The survivor of ${a.bunker} is safe with the rescue crew.`);
 }
+function drawHeliAf(){
+  const a=AF, c=ag; const sx=(Math.random()-.5)*a.shake*10;
+  c.setTransform(1,0,0,1,sx,0);
+  const sky=c.createLinearGradient(0,0,0,360); sky.addColorStop(0,'#1a0f08'); sky.addColorStop(.6,'#7a3a10'); sky.addColorStop(1,'#ffb24a');
+  c.fillStyle=sky; c.fillRect(-20,0,760,360);
+  const gl=c.createRadialGradient(110,330,10,110,330,300); gl.addColorStop(0,`rgba(255,250,220,${.8+.15*Math.sin(a.t*9)})`); gl.addColorStop(.3,'rgba(255,170,60,.55)'); gl.addColorStop(1,'rgba(255,120,40,0)');
+  c.fillStyle=gl; c.fillRect(-20,0,760,440);
+  c.fillStyle='#1a0e08'; [[10,280,60,70],[60,250,40,100],[100,300,90,50],[190,270,24,80]].forEach(([x,y,w,h])=>c.fillRect(x,y,w,h));
+  for(const s of a.smoke){ c.fillStyle=`rgba(50,30,20,${s.a})`; c.beginPath(); c.arc(s.x-60,s.y,s.r,0,Math.PI*2); c.fill(); }
+  // ground + helipads
+  c.fillStyle='#1d1a17'; c.fillRect(-20,350,760,100);
+  [[480,'1'],[660,'2']].forEach(([x,n])=>{ c.fillStyle='#3a3a3d'; c.beginPath(); c.ellipse(x,372,90,16,0,0,Math.PI*2); c.fill();
+    c.strokeStyle='#e8e2c8'; c.lineWidth=2; c.beginPath(); c.ellipse(x,372,70,12,0,0,Math.PI*2); c.stroke();
+    c.fillStyle='#e8e2c8'; c.font='700 16px "Chakra Petch", sans-serif'; c.textAlign='center'; c.fillText('H'+n,x,378); c.textAlign='left';
+    for(let i=0;i<6;i++){ c.fillStyle=Math.floor(a.t*3+i)%2?'#5fe39a':'#1f3a2b'; c.beginPath(); c.arc(x-80+i*32,388,3,0,Math.PI*2); c.fill(); } });
+  c.fillStyle='#d9d3c0'; c.font='600 11px "IBM Plex Mono", monospace'; c.fillText('C.A.M. MAIN HELIPADS',520,420);
+  // helicopter
+  const L=a.lift, hx=480+L*L*260, hy=338-L*170-L*L*40;
+  c.save(); c.translate(hx,hy); c.rotate(-L*.12);
+  c.strokeStyle='#2a2a2d'; c.lineWidth=3; c.beginPath(); c.moveTo(-40,22); c.lineTo(46,22); c.moveTo(-28,12); c.lineTo(-28,22); c.moveTo(30,12); c.lineTo(30,22); c.stroke();
+  c.fillStyle='#e9e6dc'; c.fillRect(-150,-12,110,10);
+  c.fillStyle='#d9731c'; c.fillRect(-150,-14,24,6);
+  c.save(); c.translate(-148,-10); c.rotate(a.t*40); c.fillStyle='#bbb'; c.fillRect(-2,-16,4,32); c.restore();
+  c.fillStyle='#e9e6dc'; c.beginPath(); c.ellipse(0,0,62,22,0,0,Math.PI*2); c.fill();
+  c.fillStyle='#d9731c'; c.fillRect(-58,2,110,7);
+  c.fillStyle='#9fd3ff'; c.beginPath(); c.ellipse(36,-5,22,13,0,0,Math.PI*2); c.fill();
+  c.fillStyle='#e8c3a0'; c.beginPath(); c.arc(28,-7,4.5,0,Math.PI*2); c.arc(44,-7,4.5,0,Math.PI*2); c.fill();
+  c.fillStyle='#2b3440'; c.beginPath(); c.arc(28,-9,4.8,Math.PI,0); c.arc(44,-9,4.8,Math.PI,0); c.fill();
+  c.fillStyle='#1b1b1b'; c.font='700 10px "Chakra Petch", sans-serif'; c.fillText('C.A.M. EVAC',-44,-2);
+  c.fillStyle='#3a3d42'; c.fillRect(-4,-30,8,10);
+  const rw=150*Math.abs(Math.cos(a.t*28)); c.fillStyle='rgba(60,60,64,.85)'; c.fillRect(-rw/2,-33,rw,3);
+  c.restore();
+  if(L===0){ c.fillStyle=Math.floor(a.t*4)%2?'#ff3b3b':'#ffffff'; c.beginPath(); c.arc(hx-150,hy-14,3,0,Math.PI*2); c.fill(); }
+  if(a.phase==='walk') drawPerson(a.px,376,{walk:a.walkCycle,body:'#e9eef2',stripe:'#4fd8ff'});
+  for(const p of a.parts){ c.fillStyle=p.c; c.fillRect(p.x,p.y,p.s,p.s); }
+  if(a.t<1){ c.fillStyle=`rgba(255,245,220,${1-a.t})`; c.fillRect(-20,-20,760,480); }
+  c.setTransform(1,0,0,1,0,0);
+  fadeOverlay('The helicopter carried you away.','Below you, the core burned through the C.A.M. facility.');
+}
+
 function fadeOverlay(title,sub){
   const a=AF; if(a.phase!=='fade') return;
   ag.fillStyle=`rgba(0,0,0,${a.fade})`; ag.fillRect(0,0,720,440);
@@ -1189,7 +1406,7 @@ function frame(now){
   const dt=Math.min(.1,(now-last)/1000); last=now;
   if(screen==='aftermath'&&AF){
     updateAf(dt);
-    if(AF){ if(AF.kind==='surface') drawSurfaceAf(); else if(AF.phase!=='pick') drawBunkerAf(); }
+    if(AF){ if(AF.kind==='surface') drawSurfaceAf(); else if(AF.kind==='heli') drawHeliAf(); else if(AF.phase!=='pick') drawBunkerAf(); }
   }
   if(screen==='game'&&S&&!S.ended){
     update(dt);
