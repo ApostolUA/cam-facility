@@ -7,13 +7,13 @@
 <title>C.A.M. Energy Facility</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Layout: one-screen industrial control console; menu screens centered, game = HUD bar + work area + side column (map, log). Deliberately single dark theme. */
 :root{
   --bg:#0a0f13; --panel:#111a21; --panel2:#17232c; --line:#26343f; --fg:#d9e4ea; --dim:#7f939f;
   --cyan:#4fd8ff; --amber:#ffb547; --red:#ff4d4d; --green:#5fe39a; --coin:#4d9fff;
-  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Chakra Petch","Exo 2","Segoe UI",system-ui,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   color-scheme:dark;
@@ -221,6 +221,27 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
 .melt-banner.esdp b{color:#ffd6f2} .melt-banner.esdp .count{color:#ff6fd0} .melt-banner.esdp p{color:#ffd1ef}
 .st-esdp{color:#ff6fd0}
 
+/* tutorial + language */
+.tut-intro{margin:0;color:var(--dim);max-width:70ch}
+.tut-nav{display:flex;flex-wrap:wrap;gap:6px}
+.tut-nav a{color:var(--fg);text-decoration:none;border:1px solid var(--line);padding:6px 10px;font-size:13px}
+.tut-nav a:hover{border-color:var(--cyan)}
+.tut-list{display:flex;flex-direction:column;gap:12px}
+.tut{background:var(--panel);border:1px solid var(--line);padding:16px 18px;scroll-margin-top:12px}
+.tut h3{font-size:19px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;color:var(--cyan)}
+.tut p,.tut li{max-width:72ch;line-height:1.55}
+.tut p{margin:0 0 8px}
+.tut ol,.tut ul{margin:0 0 8px;padding-left:22px;display:flex;flex-direction:column;gap:4px}
+.tut b{color:var(--fg)}
+.tut i{color:var(--amber);font-style:normal}
+.tg{font-family:var(--mono);font-size:12px;padding:1px 6px;border:1px solid currentColor}
+.tg.good{color:var(--green)} .tg.info{color:var(--fg)} .tg.warn{color:var(--amber)} .tg.err{color:var(--red)}
+.lang-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.lang{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);padding:14px 16px;text-align:left;font-family:var(--display);font-size:18px;font-weight:600}
+.lang:hover{border-color:var(--cyan)}
+.lang.on{border-color:var(--cyan);background:var(--panel2)}
+.lang small{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400}
+
 /* achievements */
 .ach-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .ach{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:14px}
@@ -243,64 +264,82 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
   <div class="menu-card">
     <div class="logo">
       <div class="logo-ring" aria-hidden="true"></div>
-      <div><h1>C.A.M.</h1><p>Main Energy Research Facility</p></div>
+      <div><h1>C.A.M.</h1><p data-i18n="menu.subtitle">Main Energy Research Facility</p></div>
     </div>
     <div class="menu-list">
-      <button class="mbtn primary" data-go="play">Play <small id="playHint">start shift</small></button>
-      <button class="mbtn" data-go="settings">Settings</button>
-      <button class="mbtn" data-go="shop">Shop <span class="coinbadge"><i></i><span class="coinTxt">0</span></span></button>
-      <button class="mbtn" data-go="achievements">Achievements <small id="achCount">0 / 6</small></button>
-      <button class="mbtn" data-go="credits">Credits</button>
-      <button class="mbtn" data-go="exit">Exit</button>
+      <button class="mbtn primary" data-go="play"><span data-i18n="menu.play">Play</span> <small id="playHint">start shift</small></button>
+      <button class="mbtn" data-go="tutorial"><span data-i18n="menu.tutorial">Tutorial</span></button>
+      <button class="mbtn" data-go="language"><span data-i18n="menu.language">Language</span> <small id="langNow">English</small></button>
+      <button class="mbtn" data-go="settings"><span data-i18n="menu.settings">Settings</span></button>
+      <button class="mbtn" data-go="shop"><span data-i18n="menu.shop">Shop</span> <span class="coinbadge"><i></i><span class="coinTxt">0</span></span></button>
+      <button class="mbtn" data-go="achievements"><span data-i18n="menu.ach">Achievements</span> <small id="achCount">0 / 10</small></button>
+      <button class="mbtn" data-go="credits"><span data-i18n="menu.credits">Credits</span></button>
+      <button class="mbtn" data-go="exit"><span data-i18n="menu.exit">Exit</span></button>
     </div>
-    <div class="menu-foot"><span>Reactor CAM-R1</span><span>Build 0.1</span></div>
+    <div class="menu-foot"><span data-i18n="menu.reactor">Reactor CAM-R1</span><span data-i18n="menu.build">Build 0.2</span></div>
   </div>
+</section>
+
+<!-- ================= TUTORIAL ================= -->
+<section id="tutorial" class="screen page" hidden>
+  <div class="page-head"><h2 data-i18n="tut.title">Tutorial</h2><button class="back" data-go="menu" data-i18n="common.back">Back</button></div>
+  <p class="tut-intro" data-i18n="tut.intro"></p>
+  <div class="tut-nav" id="tutNav"></div>
+  <div class="tut-list" id="tutList"></div>
+</section>
+
+<!-- ================= LANGUAGE ================= -->
+<section id="language" class="screen page" hidden>
+  <div class="page-head"><h2 data-i18n="lang.title">Language</h2><button class="back" data-go="menu" data-i18n="common.back">Back</button></div>
+  <p style="margin:0;color:var(--dim)" data-i18n="lang.intro"></p>
+  <div class="lang-list" id="langList"></div>
 </section>
 
 <!-- ================= SETTINGS ================= -->
 <section id="settings" class="screen page" hidden>
-  <div class="page-head"><h2>Settings</h2><button class="back" data-go="menu">Back</button></div>
+  <div class="page-head"><h2 data-i18n="set.title">Settings</h2><button class="back" data-go="menu" data-i18n="common.back">Back</button></div>
   <div>
-    <div class="set-row"><div><label for="setSound">Sound</label><p>Reactor hum, buttons and alarms.</p></div><button id="setSound" class="toggle" aria-pressed="true">ON</button></div>
-    <div class="set-row"><div><label for="setVol">Volume</label><p>Master volume.</p></div><input id="setVol" type="range" min="0" max="1" step="0.05"></div>
-    <div class="set-row"><div><label for="setShake">Screen shake</label><p>Shakes the screen during a meltdown.</p></div><button id="setShake" class="toggle" aria-pressed="true">ON</button></div>
-    <div class="set-row"><div><label for="setCheck">Startup checklist</label><p>Shows the startup order in the Main Control Room.</p></div><button id="setCheck" class="toggle" aria-pressed="true">ON</button></div>
-    <div class="set-row"><div><label for="setReset">Reset progress</label><p>Removes all blue coins and shop items.</p></div><button id="setReset" class="danger">Reset</button></div>
+    <div class="set-row"><div><label for="setSound" data-i18n="set.sound">Sound</label><p data-i18n="set.soundD"></p></div><button id="setSound" class="toggle" aria-pressed="true">ON</button></div>
+    <div class="set-row"><div><label for="setVol" data-i18n="set.vol">Volume</label><p data-i18n="set.volD"></p></div><input id="setVol" type="range" min="0" max="1" step="0.05"></div>
+    <div class="set-row"><div><label for="setShake" data-i18n="set.shake">Screen shake</label><p data-i18n="set.shakeD"></p></div><button id="setShake" class="toggle" aria-pressed="true">ON</button></div>
+    <div class="set-row"><div><label for="setCheck" data-i18n="set.check">Startup checklist</label><p data-i18n="set.checkD"></p></div><button id="setCheck" class="toggle" aria-pressed="true">ON</button></div>
+    <div class="set-row"><div><label for="setReset" data-i18n="set.reset">Reset progress</label><p data-i18n="set.resetD"></p></div><button id="setReset" class="danger">Reset</button></div>
   </div>
 </section>
 
 <!-- ================= SHOP ================= -->
 <section id="shop" class="screen page" hidden>
-  <div class="page-head"><h2>Shop</h2><div class="row-btns"><span class="coinbadge"><i></i><span class="coinTxt">0</span> blue coins</span><button class="back" data-go="menu">Back</button></div></div>
-  <p style="margin:0;color:var(--dim)">Earn blue coins by running the reactor and by escaping meltdowns. Blue coins are only used inside the game.</p>
+  <div class="page-head"><h2 data-i18n="shop.title">Shop</h2><div class="row-btns"><span class="coinbadge"><i></i><span class="coinTxt">0</span> <span data-i18n="shop.coins">blue coins</span></span><button class="back" data-go="menu" data-i18n="common.back">Back</button></div></div>
+  <p style="margin:0;color:var(--dim)" data-i18n="shop.intro"></p>
   <div id="shopList" style="display:flex;flex-direction:column;gap:22px"></div>
 </section>
 
 <!-- ================= ACHIEVEMENTS ================= -->
 <section id="achievements" class="screen page" hidden>
-  <div class="page-head"><h2>Achievements</h2><button class="back" data-go="menu">Back</button></div>
+  <div class="page-head"><h2 data-i18n="ach.title">Achievements</h2><button class="back" data-go="menu" data-i18n="common.back">Back</button></div>
   <p style="margin:0;color:var(--dim)" id="achSummary"></p>
   <div class="ach-list" id="achList"></div>
 </section>
 
 <!-- ================= CREDITS ================= -->
 <section id="credits" class="screen page" hidden>
-  <div class="page-head"><h2>Credits</h2><button class="back" data-go="menu">Back</button></div>
+  <div class="page-head"><h2 data-i18n="cred.title">Credits</h2><button class="back" data-go="menu" data-i18n="common.back">Back</button></div>
   <dl class="credits">
-    <div><dt>Game idea &amp; design</dt><dd>Director of the C.A.M. facility</dd></div>
-    <div><dt>Programming</dt><dd>Built with Claude</dd></div>
-    <div><dt>Fonts</dt><dd>Chakra Petch, IBM Plex Sans, IBM Plex Mono (Google Fonts)</dd></div>
-    <div><dt>Sound</dt><dd>Generated live in your browser</dd></div>
-    <div><dt>Special thanks</dt><dd>Every operator who made it to the surface</dd></div>
+    <div><dt data-i18n="cred.idea"></dt><dd data-i18n="cred.ideaV"></dd></div>
+    <div><dt data-i18n="cred.prog"></dt><dd data-i18n="cred.progV"></dd></div>
+    <div><dt data-i18n="cred.fonts"></dt><dd>Chakra Petch, Exo 2, IBM Plex Sans, IBM Plex Mono (Google Fonts)</dd></div>
+    <div><dt data-i18n="cred.sound"></dt><dd data-i18n="cred.soundV"></dd></div>
+    <div><dt data-i18n="cred.lang"></dt><dd data-i18n="cred.langV"></dd></div>
+    <div><dt data-i18n="cred.thanks"></dt><dd data-i18n="cred.thanksV"></dd></div>
   </dl>
 </section>
 
 <!-- ================= EXIT ================= -->
 <section id="exit" class="screen" hidden>
   <div class="end-card">
-    <h2>Systems offline</h2>
-    <p>The facility is closed for today. You can close this tab now.</p>
-    <button class="mbtn primary" data-go="menu" style="min-width:220px;justify-content:center">Back to menu</button>
+    <h2 data-i18n="exit.title">Systems offline</h2>
+    <p data-i18n="exit.text"></p>
+    <button class="mbtn primary" data-go="menu" style="min-width:220px;justify-content:center" data-i18n="exit.back">Back to menu</button>
   </div>
 </section>
 
@@ -310,13 +349,13 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
     <h2 id="resTitle">You escaped</h2>
     <p id="resText"></p>
     <div class="end-stats">
-      <div><b id="resTime">0:00</b><span>Shift time</span></div>
-      <div><b id="resEarned">0</b><span>Coins earned</span></div>
-      <div><b id="resBonus">0</b><span>Escape bonus</span></div>
+      <div><b id="resTime">0:00</b><span data-i18n="res.time">Shift time</span></div>
+      <div><b id="resEarned">0</b><span data-i18n="res.earned">Coins earned</span></div>
+      <div><b id="resBonus">0</b><span data-i18n="res.bonus">Escape bonus</span></div>
     </div>
     <div class="row-btns">
-      <button class="mbtn primary" data-go="play">New shift</button>
-      <button class="mbtn" data-go="menu">Main menu</button>
+      <button class="mbtn primary" data-go="play" data-i18n="res.new">New shift</button>
+      <button class="mbtn" data-go="menu" data-i18n="res.menu">Main menu</button>
     </div>
   </div>
 </section>
@@ -325,7 +364,7 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
 <section id="aftermath" class="screen af" hidden>
   <div class="af-head">
     <div><span class="af-eyebrow" id="afEyebrow">Aftermath</span><h2 id="afTitle">The main road</h2></div>
-    <button class="back" id="afSkip">Skip aftermath</button>
+    <button class="back" id="afSkip" data-i18n="af.skip">Skip aftermath</button>
   </div>
   <div id="crewPick" hidden>
     <div class="crew-grid" id="crewGrid"></div>
@@ -338,18 +377,18 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
 <!-- ================= GAME ================= -->
 <section id="game" class="screen" hidden>
   <div class="hud" id="hud">
-    <div class="hgrp"><span class="hl">Location</span><span class="hv" id="hLoc">—</span></div>
-    <div class="hgrp"><span class="hl">Reactor</span><span class="pill st-off" id="hStatus">OFFLINE</span></div>
-    <div class="hgrp"><span class="hl">Core temp</span><span class="hv" id="hTemp">0 °C</span></div>
-    <div class="hgrp"><span class="hl">Stability</span><span class="hv" id="hStab">100%</span></div>
-    <div class="hgrp"><span class="hl">Output</span><span class="hv" id="hOut">0 MW</span></div>
+    <div class="hgrp"><span class="hl" data-i18n="hud.loc">Location</span><span class="hv" id="hLoc">—</span></div>
+    <div class="hgrp"><span class="hl" data-i18n="hud.reactor">Reactor</span><span class="pill st-off" id="hStatus">OFFLINE</span></div>
+    <div class="hgrp"><span class="hl" data-i18n="hud.temp">Core temp</span><span class="hv" id="hTemp">0 °C</span></div>
+    <div class="hgrp"><span class="hl" data-i18n="hud.stab">Stability</span><span class="hv" id="hStab">100%</span></div>
+    <div class="hgrp"><span class="hl" data-i18n="hud.out">Output</span><span class="hv" id="hOut">0 MW</span></div>
     <div class="spacer"></div>
     <span class="coinbadge"><i></i><span class="coinTxt">0</span></span>
-    <button class="hud-menu" data-go="menu">Menu</button>
+    <button class="hud-menu" data-go="menu" data-i18n="hud.menu">Menu</button>
   </div>
   <div class="melt-banner" id="meltBanner" hidden>
     <b id="meltTitle">MELTDOWN</b><span class="count" id="meltCount">0.0</span>
-    <p id="meltText">Get to the Surface Section now.</p>
+    <p id="meltText"></p>
   </div>
   <div class="game-grid">
     <div class="box" id="secBox">
@@ -359,59 +398,59 @@ input[type=range]{width:180px;accent-color:var(--cyan)}
       <div class="routes" id="routes"></div>
       <div class="sec-actions" id="secActions"></div>
       <div class="esdp" id="esdpRoom" hidden>
-        <div class="subh">ESDP Main Control Room · Section Epsilon</div>
+        <div class="subh" data-i18n="esdp.title">ESDP Main Control Room · Section Epsilon</div>
         <div class="esdp-grid">
-          <div class="esdp-core"><div class="orb" id="esdpOrb"></div><div><span class="gl">ESDP core</span><b id="esdpState">STANDBY</b><span class="ch" id="esdpCharge">Charge 0%</span></div></div>
+          <div class="esdp-core"><div class="orb" id="esdpOrb"></div><div><span class="gl" data-i18n="esdp.core">ESDP core</span><b id="esdpState">STANDBY</b><span class="ch" id="esdpCharge">Charge 0%</span></div></div>
           <div>
-            <p>The emergency self-destruction protocol has its own core, separate from the main reactor. Once activated, the ESDP core explodes in 2 minutes and destroys the whole facility. It cannot be stopped.</p>
+            <p data-i18n="esdp.text"></p>
             <div class="btns">
-              <button class="pbtn" id="esdpArm"><span class="lamp"></span><span class="pl">Arm ESDP</span><span class="ps">turn the arming key</span></button>
-              <button class="pbtn emerg" id="esdpGo"><span class="lamp"></span><span class="pl">Activate ESDP</span><span class="ps">arm it first</span></button>
+              <button class="pbtn" id="esdpArm"><span class="lamp"></span><span class="pl">Arm ESDP</span><span class="ps"></span></button>
+              <button class="pbtn emerg" id="esdpGo"><span class="lamp"></span><span class="pl" data-i18n="esdp.activate">Activate ESDP</span><span class="ps"></span></button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="cr" id="controlRoom" hidden>
-        <div class="subh" style="margin:6px 0 0">Main Control Room · view into the reactor chamber</div>
+        <div class="subh" style="margin:6px 0 0" data-i18n="cr.title">Main Control Room · view into the reactor chamber</div>
         <div class="chamber-wrap"><canvas id="chamber" width="720" height="440"></canvas></div>
         <div class="gauges">
-          <div class="gauge"><div class="gl">Core temp</div><div class="gv" id="gTemp">0 °C</div><div class="gb"><i id="gbTemp"></i></div></div>
-          <div class="gauge"><div class="gl">Stability</div><div class="gv" id="gStab">100%</div><div class="gb"><i id="gbStab"></i></div></div>
-          <div class="gauge"><div class="gl">Containment</div><div class="gv" id="gCont">0%</div><div class="gb"><i id="gbCont"></i></div></div>
-          <div class="gauge"><div class="gl">Output</div><div class="gv" id="gOut">0 MW</div><div class="gb"><i id="gbOut"></i></div></div>
+          <div class="gauge"><div class="gl" data-i18n="hud.temp">Core temp</div><div class="gv" id="gTemp">0 °C</div><div class="gb"><i id="gbTemp"></i></div></div>
+          <div class="gauge"><div class="gl" data-i18n="hud.stab">Stability</div><div class="gv" id="gStab">100%</div><div class="gb"><i id="gbStab"></i></div></div>
+          <div class="gauge"><div class="gl" data-i18n="hud.cont">Containment</div><div class="gv" id="gCont">0%</div><div class="gb"><i id="gbCont"></i></div></div>
+          <div class="gauge"><div class="gl" data-i18n="hud.out">Output</div><div class="gv" id="gOut">0 MW</div><div class="gb"><i id="gbOut"></i></div></div>
         </div>
         <div class="panel" id="panel"></div>
         <div id="checkWrap">
-          <div class="subh" style="margin-top:4px">Startup order</div>
+          <div class="subh" style="margin-top:4px" data-i18n="cr.order">Startup order</div>
           <ul class="checklist" id="checklist"></ul>
         </div>
       </div>
     </div>
     <div class="side">
       <div class="box">
-        <div class="subh" style="margin-top:0">Facility map</div>
+        <div class="subh" style="margin-top:0" data-i18n="side.map">Facility map</div>
         <svg id="map" viewBox="0 0 300 360" role="img" aria-label="Facility map"></svg>
       </div>
       <div class="box">
-        <div class="subh" style="margin-top:0">Reactor (remote readout)</div>
+        <div class="subh" style="margin-top:0" data-i18n="side.remote">Reactor (remote readout)</div>
         <div class="mini">
-          <span>Main reactor</span><b id="mMain">OFF</b>
-          <span>Containment</span><b id="mCont">OFF</b>
-          <span>Lasers</span><b id="mLas">RETRACTED</b>
-          <span>Glass doors</span><b id="mGlass">OPEN</b>
-          <span>Coolant</span><b id="mCool">ON</b>
+          <span data-i18n="side.main">Main reactor</span><b id="mMain">OFF</b>
+          <span data-i18n="side.cont">Containment</span><b id="mCont">OFF</b>
+          <span data-i18n="side.lasers">Lasers</span><b id="mLas">RETRACTED</b>
+          <span data-i18n="side.glass">Glass doors</span><b id="mGlass">OPEN</b>
+          <span data-i18n="side.cool">Coolant</span><b id="mCool">ON</b>
         </div>
       </div>
       <div class="box">
-        <div class="subh" style="margin-top:0">Event log</div>
+        <div class="subh" style="margin-top:0" data-i18n="side.log">Event log</div>
         <ul class="log" id="log"></ul>
       </div>
     </div>
   </div>
 </section>
 
-<div class="toast" id="toast" hidden><span class="ach-icon" id="toastIcon"></span><div><small>Achievement unlocked</small><b id="toastName"></b></div></div>
+<div class="toast" id="toast" hidden><span class="ach-icon" id="toastIcon"></span><div><small data-i18n="ach.toast">Achievement unlocked</small><b id="toastName"></b></div></div>
 
 <script>
 (()=>{
@@ -431,18 +470,64 @@ let saveTimer=0;
 const persist=()=>store.set('save',save);
 const has=id=>save.owned.includes(id);
 
+/* ---------------- languages ---------------- */
+const I18N={"en":{"menu.subtitle":"Main Energy Research Facility","menu.play":"Play","menu.start":"start shift","menu.resume":"resume shift","menu.tutorial":"Tutorial","menu.language":"Language","menu.settings":"Settings","menu.shop":"Shop","menu.ach":"Achievements","menu.credits":"Credits","menu.exit":"Exit","menu.reactor":"Reactor CAM-R1","menu.build":"Build 0.2","common.back":"Back","common.on":"ON","common.off":"OFF","lang.title":"Language","lang.intro":"Choose the language of the game.","tut.title":"Tutorial","tut.intro":"Welcome, operator. Here is everything you need to run the C.A.M. Main Energy Research Facility and get out alive.","tut.startup.h":"1 · How to start the reactor","tut.startup.b":"<p>Go to the Main Section. The Main Control Room has the control panel and a window into the reactor chamber. Press the buttons in this order:<\/p><ol><li><b>Coolant pumps<\/b> — leave them ON (they are on when the shift starts).<\/li><li><b>Startup containment field<\/b> — wait until the field reaches 100%.<\/li><li><b>Extend all lasers<\/b> — the laser doors open and the lasers slide out.<\/li><li><b>Stabilization lasers<\/b> (left / right) — always turn these on before the power lasers.<\/li><li><b>Energy lasers<\/b> (upper / lower).<\/li><li><b>Power lasers<\/b> (corners).<\/li><li><b>Close glass protection doors<\/b>.<\/li><li><b>Main startup<\/b>.<\/li><\/ol><p>The startup order list under the panel ticks off each step. Doing every step before the main startup unlocks the Main Startup Success achievement.<\/p>","tut.control.h":"2 · How to control the reactor","tut.control.b":"<ul><li><b>Core temp<\/b> — normal running is about 2,000–2,500 °C. Too hot or too cold starts an emergency.<\/li><li><b>Stability<\/b> — keep it high. Power lasers without stabilization lasers, or no containment field, make it drop.<\/li><li><b>Containment<\/b> — the field around the core. Keep it at 100% while the reactor runs.<\/li><li><b>Output<\/b> — the power you make. More output earns more blue coins.<\/li><li><b>Coolant pumps<\/b> cool the core. <b>Coolant overdrive<\/b> cools it much faster but lowers the output.<\/li><li><b>Emergency shutdown<\/b> turns everything off and makes the reactor safe in 8 seconds.<\/li><li>Plasma surges happen now and then. Stabilization lasers make them much weaker.<\/li><\/ul>","tut.log.h":"3 · Keep an eye on the event log","tut.log.b":"<p>The event log on the right lists everything that happens, with the shift time. The color shows how serious it is:<\/p><ul><li><span class=\"tg good\">Green<\/span> — good news.<\/li><li><span class=\"tg info\">White<\/span> — normal information.<\/li><li><span class=\"tg warn\">Amber<\/span> — a warning. Something needs your attention.<\/li><li><span class=\"tg err\">Red<\/span> — danger. Act now.<\/li><\/ul><p>The reactor keeps running while you walk around the facility, so check the log and the remote readout often.<\/p>","tut.events.h":"4 · The events","tut.events.b":"<ul><li><b>MELTDOWN<\/b> — the core loses all stability. You have 45 seconds to escape.<\/li><li><b>FREEZEDOWN<\/b> — the core falls below −165 °C (for example, coolant overdrive left on while the reactor is off). It ends in a very cold explosion. You have 45 seconds to escape.<\/li><li><b>BURNDOWN<\/b> — the core passes 6,000 °C (for example, coolant pumps off while the reactor runs). Only the evacuation helicopter can save you.<\/li><li><b>ESDP<\/b> — the self-destruct you start yourself. You have 2 minutes to escape.<\/li><\/ul><p>During an event the control panel stops working and one sector may collapse, so you must find another way.<\/p>","tut.escape.h":"5 · Emergency escape methods","tut.escape.b":"<ul><li><b>Surface Section<\/b> — climb up through the sectors to the surface. Works for a meltdown, a freezedown and the ESDP.<\/li><li><b>Emergency Bunker Alpha<\/b> (from Sector D) and <b>Emergency Bunker Beta<\/b> (from Sector B) — shut yourself in. Works for a meltdown, a freezedown and the ESDP. A collapsed sector can cut a bunker off.<\/li><li><b>Evacuation helicopter<\/b> — only in a burndown. Go to the Surface Section, press <i>Go to the main helipads<\/i> and wait. The helicopter with two pilots lands 30 seconds after the burndown starts and leaves 30 seconds later. Press <i>Board the evacuation helicopter<\/i> in time.<\/li><\/ul><p>Green route buttons show the way to safety. After an escape you can play the aftermath or press <i>Skip aftermath<\/i>.<\/p>","tut.esdp.h":"6 · The ESDP","tut.esdp.b":"<p>The emergency self-destruction protocol (ESDP) has its own core, separate from the main reactor. To use it:<\/p><ol><li>Go to <b>Section Epsilon<\/b> and press <i>Enter the ESDP main control room<\/i>.<\/li><li>Press <b>Arm ESDP<\/b> to turn the arming key.<\/li><li>Press <b>Activate ESDP<\/b>.<\/li><\/ol><p>The ESDP core explodes in 2 minutes and destroys the whole facility. It cannot be stopped, so run for the Surface Section or a bunker right away.<\/p>","set.title":"Settings","set.sound":"Sound","set.soundD":"Reactor hum, buttons and alarms.","set.vol":"Volume","set.volD":"Master volume.","set.shake":"Screen shake","set.shakeD":"Shakes the screen during an emergency.","set.check":"Startup checklist","set.checkD":"Shows the startup order in the Main Control Room.","set.reset":"Reset progress","set.resetD":"Removes all blue coins, shop items and achievements.","set.resetBtn":"Reset","set.resetConfirm":"Tap again to confirm","set.resetDone":"Progress reset","shop.title":"Shop","shop.coins":"blue coins","shop.intro":"Earn blue coins by running the reactor and by escaping emergencies. Blue coins are only used inside the game.","shop.buy":"Buy · {n} coins","shop.equip":"Equip","shop.equipped":"Equipped","shop.owned":"Owned","shop.cat.laser":"Laser colors","shop.cat.core":"Reactor core","shop.cat.up":"Upgrades","shop.laser_default.name":"Standard Issue","shop.laser_default.desc":"Cyan energy, green stabilization and amber power lasers.","shop.laser_crimson.name":"Crimson Set","shop.laser_crimson.desc":"Hot red beams for every laser group.","shop.laser_violet.name":"Violet Set","shop.laser_violet.desc":"Purple and indigo beams.","shop.laser_gold.name":"Gold Set","shop.laser_gold.desc":"Bright gold beams. Very shiny.","shop.core_default.name":"Blue Plasma","shop.core_default.desc":"The standard CAM-R1 plasma core.","shop.core_green.name":"Green Plasma","shop.core_green.desc":"An experimental green plasma mix.","shop.core_solar.name":"Solar Core","shop.core_solar.desc":"Burns like a tiny sun.","shop.core_void.name":"Void Core","shop.core_void.desc":"A dark core with a purple edge.","shop.up_shoes.name":"Running Shoes","shop.up_shoes.desc":"Move between sections 30% faster.","shop.up_coolant.name":"Coolant Upgrade","shop.up_coolant.desc":"The reactor runs about 240 °C cooler.","shop.up_shield.name":"Reinforced Bulkheads","shop.up_shield.desc":"+15 seconds to escape during a meltdown or freezedown.","ach.title":"Achievements","ach.summary":"{n} of {total} unlocked.","ach.unlocked":"Unlocked {date}","ach.toast":"Achievement unlocked","ach.startup.name":"Main Startup Success","ach.startup.desc":"Start the main reactor with every step of the startup order done.","ach.meltdown.name":"The Meltdown","ach.meltdown.desc":"Let the main reactor go into meltdown.","ach.shutdown.name":"Emergency Shutdown Success","ach.shutdown.desc":"Finish an emergency shutdown and keep the reactor safe.","ach.surface.name":"Surface Escape","ach.surface.desc":"Survive a meltdown, freezedown or ESDP by reaching the Surface Section.","ach.bunkerB.name":"Bunker Beta Escape","ach.bunkerB.desc":"Survive a meltdown, freezedown or ESDP inside Emergency Bunker Beta.","ach.bunkerA.name":"Bunker Alpha Escape","ach.bunkerA.desc":"Survive a meltdown, freezedown or ESDP inside Emergency Bunker Alpha.","ach.freezedown.name":"The Freezedown","ach.freezedown.desc":"Let the core freeze below −165 °C.","ach.burndown.name":"The Burndown","ach.burndown.desc":"Let the core burn past 6,000 °C.","ach.esdp.name":"The ESDP","ach.esdp.desc":"Activate the emergency self-destruction protocol (ESDP).","ach.heli.name":"Helicopter Escape","ach.heli.desc":"Escape a burndown on the evacuation helicopter.","cred.title":"Credits","cred.idea":"Game idea & design","cred.ideaV":"Director of the C.A.M. facility","cred.prog":"Programming","cred.progV":"Built with Claude","cred.fonts":"Fonts","cred.sound":"Sound","cred.soundV":"Generated live in your browser","cred.lang":"Languages","cred.langV":"English, Ukrainian, Italian, British English, French","cred.thanks":"Special thanks","cred.thanksV":"Every operator who made it to safety","exit.title":"Systems offline","exit.text":"The facility is closed for today. You can close this tab now.","exit.back":"Back to menu","res.time":"Shift time","res.earned":"Coins earned","res.bonus":"Escape bonus","res.new":"New shift","res.menu":"Main menu","res.flew":"You flew out","res.bunker":"You survived in the bunker","res.escaped":"You escaped","res.heliText":"You boarded the C.A.M. emergency evacuation helicopter with {n} seconds to spare. The two pilots lifted off as the core burned through the facility below.","res.bunkerText":"You sealed yourself inside {place} with {n} seconds to spare. {blast}, but the bunker held. Rescue teams dug you out the next morning.","res.surfText":"You reached the Surface Section with {n} seconds to spare. {blast}","res.fail.meltdown.t":"Facility lost","res.fail.meltdown.d":"The main reactor detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker the moment the alarms start.","res.fail.freezedown.t":"Frozen solid","res.fail.freezedown.d":"The main reactor burst in a freezing blast before you reached safety. Next time, run for the Surface Section or an emergency bunker as soon as the frost alarms start.","res.fail.esdp.t":"Self-destructed","res.fail.esdp.d":"The ESDP core detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker right after you activate the ESDP.","res.fail.burndown.t":"Burned down","res.fail.burndown.d":"The evacuation helicopter left the main helipads without you, and the core burned through the facility. Next time, head straight for the helipads in the Surface Section.","blast.meltdown.far":"The main reactor detonated far below you.","blast.meltdown.bunk":"The whole facility shook","blast.freezedown.far":"The main reactor burst in a freezing blast far below you and covered the facility in ice.","blast.freezedown.bunk":"A freezing blast turned the facility to ice","blast.esdp.far":"The ESDP core detonated far below you and took the whole facility with it.","blast.esdp.bunk":"The ESDP core blast tore through the whole facility","hud.loc":"Location","hud.reactor":"Reactor","hud.temp":"Core temp","hud.stab":"Stability","hud.out":"Output","hud.menu":"Menu","hud.cont":"Containment","st.offline":"OFFLINE","st.online":"ONLINE","st.warning":"WARNING","st.shutdown":"EMERGENCY SHUTDOWN","cr.title":"Main Control Room · view into the reactor chamber","cr.order":"Startup order","side.map":"Facility map","side.remote":"Reactor (remote readout)","side.main":"Main reactor","side.cont":"Containment","side.lasers":"Lasers","side.glass":"Glass doors","side.cool":"Coolant","side.log":"Event log","ro.overdrive":"OVERDRIVE","ro.extended":"EXTENDED","ro.retracted":"RETRACTED","ro.moving":"MOVING","ro.closed":"CLOSED","ro.open":"OPEN","sec.surface.name":"Surface Section","sec.surface.tag":"Level 0","sec.surface.desc":"Main helipads, guard post and the top of the elevator shafts. Open sky and cold wind. In an emergency, this is where you need to be.","sec.A.name":"Sector A","sec.A.tag":"Level −1","sec.A.desc":"Reception and the security checkpoint. Elevators lead down to the research levels.","sec.B.name":"Sector B","sec.B.tag":"Level −2","sec.B.desc":"Laser calibration labs. Spare laser lenses and emitter parts line the walls.","sec.C.name":"Sector C","sec.C.tag":"Level −2","sec.C.desc":"Living quarters and the cafeteria for the research staff.","sec.D.name":"Sector D","sec.D.tag":"Level −3","sec.D.desc":"Coolant pumping station. Huge pipes hum with chilled water headed for the reactor.","sec.bunkerA.name":"Emergency Bunker Alpha","sec.bunkerA.tag":"Sector D · shelter","sec.bunkerA.desc":"A blast-proof shelter behind a meter-thick steel door, with air tanks, water and bunk beds. In a meltdown, a freezedown or the ESDP, you can survive in here.","sec.bunkerB.name":"Emergency Bunker Beta","sec.bunkerB.tag":"Sector B · shelter","sec.bunkerB.desc":"A blast-proof shelter dug into the rock under the laser labs. Thick walls, emergency lights and supplies for a long wait. In a meltdown, a freezedown or the ESDP, you can survive in here.","sec.zero.name":"Section Zero","sec.zero.tag":"Level −4","sec.zero.desc":"The old first-generation test chamber, sealed since the early days of the facility.","sec.epsilon.name":"Section Epsilon","sec.epsilon.tag":"Level −5","sec.epsilon.desc":"Power distribution hub. Thick cables carry energy from the reactor to the whole facility. Behind a sealed door is the ESDP main control room for the emergency self-destruction protocol.","sec.main.name":"Main Section","sec.main.tag":"Level −6","sec.main.desc":"Home of the main reactor. The Main Control Room looks into the reactor chamber through the glass protection doors.","map.surface":"SURFACE","map.A":"SECTOR A","map.B":"SECTOR B","map.C":"SECTOR C","map.D":"SECTOR D","map.bunkerA":"BUNKER ALPHA","map.bunkerB":"BUNKER BETA","map.zero":"ZERO","map.epsilon":"EPSILON","map.main":"MAIN","travel.moving":"Moving to {place}…","route.collapsed":"(collapsed)","act.search":"Search for supplies","act.searched":"Searched · again in {n}s","act.end":"End shift and go home","act.esdpEnter":"Enter the ESDP main control room","act.esdpLeave":"Leave the ESDP main control room","act.padGo":"Go to the main helipads","act.padGoing":"Heading to the main helipads…","act.board":"Board the evacuation helicopter","act.wait":"Waiting at the main helipads for the helicopter…","esdp.title":"ESDP Main Control Room · Section Epsilon","esdp.core":"ESDP core","esdp.text":"The emergency self-destruction protocol has its own core, separate from the main reactor. Once activated, the ESDP core explodes in 2 minutes and destroys the whole facility. It cannot be stopped.","esdp.arm":"Arm ESDP","esdp.disarm":"Disarm ESDP","esdp.armKey":"turn the arming key","esdp.armTurned":"arming key turned","esdp.locked":"locked","esdp.activate":"Activate ESDP","esdp.armFirst":"arm it first","esdp.ready":"ready","esdp.activated":"activated · cannot be stopped","esdp.standby":"STANDBY","esdp.armed":"ARMED","esdp.detonating":"DETONATING","esdp.charge0":"Charge 0%","esdp.charge":"Charge {p}% · explodes in {t}","p.contain.on":"Disengage containment field","p.contain.off":"Startup containment field","p.ext.on":"Retract all lasers & close laser doors","p.ext.off":"Extend all lasers","p.ext.extended":"extended","p.ext.retracted":"retracted","p.ext.extending":"extending…","p.ext.retracting":"retracting…","p.stab":"Stabilization lasers · left / right","p.energy":"Energy lasers · upper / lower","p.power":"Power lasers · corners","p.glass.on":"Open glass protection doors","p.glass.off":"Close glass protection doors","p.glass.closed":"closed","p.glass.open":"open","p.glass.closing":"closing…","p.glass.opening":"opening…","p.pumps":"Coolant pumps","p.od":"Coolant overdrive","p.odOn":"ON · cooling fast","p.odNeeds":"needs coolant pumps","p.main.on":"Main power down","p.main.off":"Main startup","p.emerg":"Emergency shutdown","p.emergProg":"in progress · {n}s","p.emergIdle":"stops everything","p.doorsClosed":"laser doors closed","ck.pumps":"Coolant pumps running","ck.contain":"Containment field online","ck.ext":"All lasers extended","ck.stab":"Stabilization lasers on","ck.energy":"Energy lasers on","ck.power":"Power lasers on","ck.glass":"Glass protection doors closed","ck.main":"Main startup","ln.energy":"Energy lasers","ln.stab":"Stabilization lasers","ln.power":"Power lasers","log.start":"Shift started. You are in the Main Control Room.","log.collapsedWay":"The way into {place} has collapsed. Find another route.","log.bunkerBurn":"The bunker doors will not hold against a burndown! Get to the main helipads in the Surface Section!","log.surfaceBurn":"Surface Section reached. Get to the main helipads!","log.found":"Found blue coins in {place}: +{n}.","log.esdpEnter":"You entered the ESDP main control room.","log.padRun":"Running to the main helipads…","log.board":"You climbed aboard. The pilots are lifting off!","log.esdpActiveKey":"The ESDP is active. The arming key is locked.","log.esdpLocked":"The ESDP is locked during an emergency. Evacuate!","log.esdpArmed":"ESDP armed. Press Activate ESDP to start the self-destruct.","log.esdpDisarmed":"ESDP disarmed.","log.esdpAlready":"The ESDP is already active. Evacuate!","log.esdpArmFirst":"Arm the ESDP first.","log.shutFail":"Emergency shutdown failed. The {ev} cannot be stopped. Evacuate!","log.noControl":"Controls are not responding. Evacuate!","log.shutLocked":"Emergency shutdown in progress. Controls are locked.","log.contOn":"Containment field starting up.","log.contOffRun":"Containment field disengaged while the reactor is running!","log.contOff":"Containment field disengaged.","log.mainNoCont":"Main startup without the containment field! The core is unstable!","log.mainGlass":"Main startup with the glass protection doors open.","log.mainOk":"Main startup. The reactor is coming online.","log.mainDown":"Main reactor powering down.","log.glassClose":"Closing glass protection doors.","log.glassOpen":"Opening glass protection doors.","log.extOff":"All lasers off. Retracting lasers and closing laser doors.","log.extOn":"Opening laser doors and extending all lasers.","log.laserDoors":"{laser}: laser doors are closed. Extend all lasers first.","log.powerNoStab":"Power lasers on without stabilization lasers! Stability dropping!","log.laserOn":"{laser} on.","log.laserOff":"{laser} off.","log.pumpsStopRun":"Coolant pumps stopped while the reactor is running! The core will overheat!","log.pumpsStop":"Coolant pumps stopped.","log.pumpsOn":"Coolant pumps running.","log.odNeeds":"Coolant overdrive needs the coolant pumps running.","log.odOn":"Coolant overdrive on. The core is cooling fast — do not let it freeze.","log.odOff":"Coolant overdrive off.","log.emerg":"EMERGENCY SHUTDOWN. All lasers off, reactor shutting down, glass doors closing.","log.event":"{ev}: {reason}","why.meltdown":"the core lost all stability.","why.burndown":"the core passed 6,000 °C.","why.freezedown":"the core fell below −165 °C.","why.esdp":"the emergency self-destruction protocol was activated. The ESDP core explodes in 2 minutes.","log.debris":"Debris has blocked {place}. Find another way!","log.heliComing":"A C.A.M. emergency evacuation helicopter is on its way to the main helipads. It lands in 30 seconds.","log.heliLanded":"The evacuation helicopter has landed on the main helipads. Two pilots are waiting. It leaves in 30 seconds!","log.atPad":"You are at the main helipads.","log.heliGone":"The evacuation helicopter took off without you.","log.surge":"Plasma surge detected in the core.","log.hot":"Core overheating! Turn the coolant pumps back on!","log.cold":"Core is freezing! Turn off coolant overdrive!","log.shutDone":"Emergency shutdown complete. The reactor is safe.","ev.burnComing":"Get to the main helipads in the Surface Section! The evacuation helicopter lands in {n}s. The bunkers will not survive a burndown. {place} has collapsed.","ev.burnLanded":"The evacuation helicopter is on the main helipads! It leaves in {n}s — board it now.","ev.esdp":"The ESDP core explodes in {t}. Get to the Surface Section or an emergency bunker!","ev.freezePre":"The core is freezing solid. ","ev.escape":"Get to the Surface Section or an emergency bunker! {place} has collapsed, so {bunker} is cut off — use another route.","cnt.lands":"lands in {n}s","cnt.leaves":"leaves in {n}s","crew.chief.role":"Leads the rescue team. Steady at every job.","crew.digger.role":"Excavation specialist. Digs fast, but is slow with heavy doors.","crew.eng.role":"Blast-door engineer. Opens doors fast, digs a bit slower.","crew.dig":"Digging","crew.doors":"Doors","af.skip":"Skip aftermath","af.title.heli":"The main helipads","af.title.road":"The main road","af.title.rescue":"Rescue at {place}","af.eb.heli":"Aftermath · Burndown evacuation","af.eb.surf":"Aftermath · {ev} surface escape","af.eb.bunk":"Aftermath · {ev} · C.A.M. Emergency Rescue Corps","af.h.walkHeli":"The core is burning through the facility. Hold Walk (or the → key) to run to the evacuation helicopter.","af.h.walk":"The reactor is gone. Hold Walk (or the → key) to follow the main road to the main gates.","af.h.liftoff":"You are aboard. The two pilots lift off from the main helipads…","af.h.pick":"The C.A.M. Emergency Rescue Corps has arrived above {place}. Pick the crew worker you want to play as.","af.h.dig":"Tap Dig (or press Space) to clear the rubble down to the bunker doors.","af.h.walkdoor":"The bunker doors are clear. Walking over to the door wheel…","af.h.door":"Hold Open doors (or Space) to turn the door wheel.","af.h.opening":"The blast door is opening…","af.h.rescue":"The operator is alive!","af.b.walk":"Walk ▶","af.b.dig":"Dig","af.b.open":"Open doors","af.found":"Operator found alive!","af.rubble":"RUBBLE CLEARED","af.wheel":"DOOR WHEEL","af.f.gates":"You walked out through the main gates.","af.f.frozen":"The C.A.M. facility is frozen solid, but you made it.","af.f.gone":"The C.A.M. facility is gone, but you made it.","af.f.rescue":"Rescue complete.","af.f.rescueSub":"The survivor of {place} is safe with the rescue crew.","af.f.heli":"The helicopter carried you away.","af.f.heliSub":"Below you, the core burned through the C.A.M. facility."},"uk":{"menu.subtitle":"Головний енергетичний дослідницький комплекс","menu.play":"Грати","menu.start":"почати зміну","menu.resume":"продовжити зміну","menu.tutorial":"Навчання","menu.language":"Мова","menu.settings":"Налаштування","menu.shop":"Крамниця","menu.ach":"Досягнення","menu.credits":"Автори","menu.exit":"Вихід","menu.reactor":"Реактор CAM-R1","menu.build":"Версія 0.2","common.back":"Назад","common.on":"УВІМК","common.off":"ВИМК","lang.title":"Мова","lang.intro":"Обери мову гри.","tut.title":"Навчання","tut.intro":"Вітаємо, операторе! Тут усе, що треба, щоб керувати Головним енергетичним дослідницьким комплексом C.A.M. і вибратися звідти живим.","tut.startup.h":"1 · Як запустити реактор","tut.startup.b":"<p>Іди в Головну секцію. У Головній диспетчерській є пульт керування і вікно в камеру реактора. Натискай кнопки в такому порядку:<\/p><ol><li><b>Насоси охолодження<\/b> — залиш їх УВІМКНЕНИМИ (на початку зміни вони вже працюють).<\/li><li><b>Запустити поле утримання<\/b> — зачекай, поки поле дійде до 100%.<\/li><li><b>Висунути всі лазери<\/b> — лазерні дверцята відчиняться, і лазери виїдуть.<\/li><li><b>Стабілізаційні лазери<\/b> (ліві / праві) — завжди вмикай їх раніше за силові лазери.<\/li><li><b>Енергетичні лазери<\/b> (верхні / нижні).<\/li><li><b>Силові лазери<\/b> (кутові).<\/li><li><b>Зачинити захисні скляні двері<\/b>.<\/li><li><b>Головний запуск<\/b>.<\/li><\/ol><p>Список порядку запуску під пультом позначає кожен виконаний крок. Якщо зробиш усі кроки перед головним запуском, відкриєш досягнення «Успішний головний запуск».<\/p>","tut.control.h":"2 · Як керувати реактором","tut.control.b":"<ul><li><b>Темп. ядра<\/b> — у нормі близько 2 000–2 500 °C. Надто гаряче або надто холодно — і починається аварія.<\/li><li><b>Стабільність<\/b> — тримай її високою. Силові лазери без стабілізаційних або робота без поля утримання її знижують.<\/li><li><b>Утримання<\/b> — поле навколо ядра. Поки реактор працює, тримай його на 100%.<\/li><li><b>Потужність<\/b> — енергія, яку ти виробляєш. Що більша потужність, то більше синіх монет.<\/li><li><b>Насоси охолодження<\/b> охолоджують ядро. <b>Форсаж охолодження<\/b> охолоджує набагато швидше, але знижує потужність.<\/li><li><b>Аварійна зупинка<\/b> вимикає все й за 8 секунд робить реактор безпечним.<\/li><li>Час від часу трапляються плазмові сплески. Стабілізаційні лазери роблять їх набагато слабшими.<\/li><\/ul>","tut.log.h":"3 · Стеж за журналом подій","tut.log.b":"<p>Журнал подій праворуч показує все, що відбувається, із часом зміни. Колір підказує, наскільки це серйозно:<\/p><ul><li><span class=\"tg good\">Зелений<\/span> — добрі новини.<\/li><li><span class=\"tg info\">Білий<\/span> — звичайна інформація.<\/li><li><span class=\"tg warn\">Жовтий<\/span> — попередження. Щось потребує твоєї уваги.<\/li><li><span class=\"tg err\">Червоний<\/span> — небезпека. Дій негайно.<\/li><\/ul><p>Реактор працює й тоді, коли ти ходиш комплексом, тож часто заглядай у журнал і на віддалені показники.<\/p>","tut.events.h":"4 · Аварії","tut.events.b":"<ul><li><b>MELTDOWN<\/b> — ядро повністю втрачає стабільність. У тебе 45 секунд, щоб утекти.<\/li><li><b>FREEZEDOWN<\/b> — ядро охолоджується нижче −165 °C (наприклад, якщо форсаж охолодження лишився ввімкненим, коли реактор вимкнено). Усе закінчується дуже холодним вибухом. У тебе 45 секунд, щоб утекти.<\/li><li><b>BURNDOWN<\/b> — ядро нагрівається понад 6 000 °C (наприклад, якщо вимкнути насоси охолодження, коли реактор працює). Урятувати може тільки евакуаційний гелікоптер.<\/li><li><b>ESDP<\/b> — самознищення, яке ти запускаєш сам. У тебе 2 хвилини, щоб утекти.<\/li><\/ul><p>Під час аварії пульт керування не працює, а один із секторів може обвалитися, тож доведеться шукати інший шлях.<\/p>","tut.escape.h":"5 · Як урятуватися","tut.escape.b":"<ul><li><b>Поверхня<\/b> — підіймайся крізь сектори нагору. Рятує від meltdown, freezedown і ESDP.<\/li><li><b>Аварійний бункер Альфа<\/b> (із Сектора D) і <b>Аварійний бункер Бета<\/b> (із Сектора B) — зачинись усередині. Рятує від meltdown, freezedown і ESDP. Обвал сектора може відрізати шлях до бункера.<\/li><li><b>Евакуаційний гелікоптер<\/b> — тільки під час burndown. Іди на Поверхню, натисни <i>Йти до головних гелімайданчиків<\/i> і чекай. Гелікоптер із двома пілотами сідає через 30 секунд після початку burndown і відлітає ще через 30 секунд. Встигни натиснути <i>Сісти в евакуаційний гелікоптер<\/i>.<\/li><\/ul><p>Зелені кнопки маршруту показують шлях до безпеки. Після втечі можна зіграти наслідки або натиснути <i>Пропустити наслідки<\/i>.<\/p>","tut.esdp.h":"6 · ESDP","tut.esdp.b":"<p>Аварійний протокол самознищення (ESDP) має власне ядро, окреме від головного реактора. Щоб його запустити:<\/p><ol><li>Іди в <b>Секцію Епсилон<\/b> і натисни <i>Увійти в головну диспетчерську ESDP<\/i>.<\/li><li>Натисни <b>Взвести ESDP<\/b>, щоб повернути ключ взведення.<\/li><li>Натисни <b>Активувати ESDP<\/b>.<\/li><\/ol><p>Ядро ESDP вибухне за 2 хвилини й знищить увесь комплекс. Зупинити його не можна, тож одразу біжи на Поверхню або в бункер.<\/p>","set.title":"Налаштування","set.sound":"Звук","set.soundD":"Гудіння реактора, кнопки й сирени.","set.vol":"Гучність","set.volD":"Загальна гучність.","set.shake":"Трясіння екрана","set.shakeD":"Екран трясеться під час аварії.","set.check":"Список запуску","set.checkD":"Показує порядок запуску в Головній диспетчерській.","set.reset":"Скинути прогрес","set.resetD":"Видаляє всі сині монети, покупки й досягнення.","set.resetBtn":"Скинути","set.resetConfirm":"Натисни ще раз, щоб підтвердити","set.resetDone":"Прогрес скинуто","shop.title":"Крамниця","shop.coins":"сині монети","shop.intro":"Заробляй сині монети, керуючи реактором і рятуючись від аварій. Сині монети діють тільки в грі.","shop.buy":"Купити · монет: {n}","shop.equip":"Обрати","shop.equipped":"Обрано","shop.owned":"Куплено","shop.cat.laser":"Кольори лазерів","shop.cat.core":"Ядро реактора","shop.cat.up":"Покращення","shop.laser_default.name":"Стандартний набір","shop.laser_default.desc":"Блакитні енергетичні, зелені стабілізаційні й бурштинові силові лазери.","shop.laser_crimson.name":"Багряний набір","shop.laser_crimson.desc":"Гарячі червоні промені для всіх груп лазерів.","shop.laser_violet.name":"Фіолетовий набір","shop.laser_violet.desc":"Фіолетові й індигові промені.","shop.laser_gold.name":"Золотий набір","shop.laser_gold.desc":"Яскраві золоті промені. Дуже блискучі.","shop.core_default.name":"Синя плазма","shop.core_default.desc":"Стандартне плазмове ядро CAM-R1.","shop.core_green.name":"Зелена плазма","shop.core_green.desc":"Експериментальна суміш зеленої плазми.","shop.core_solar.name":"Сонячне ядро","shop.core_solar.desc":"Палає, як маленьке сонце.","shop.core_void.name":"Ядро порожнечі","shop.core_void.desc":"Темне ядро з фіолетовим краєм.","shop.up_shoes.name":"Кросівки","shop.up_shoes.desc":"Переходиш між секціями на 30% швидше.","shop.up_coolant.name":"Краще охолодження","shop.up_coolant.desc":"Реактор працює приблизно на 240 °C холодніше.","shop.up_shield.name":"Посилені перегородки","shop.up_shield.desc":"+15 секунд на втечу під час meltdown або freezedown.","ach.title":"Досягнення","ach.summary":"Відкрито {n} з {total}.","ach.unlocked":"Відкрито {date}","ach.toast":"Нове досягнення","ach.startup.name":"Успішний головний запуск","ach.startup.desc":"Запусти головний реактор, виконавши всі кроки порядку запуску.","ach.meltdown.name":"Meltdown","ach.meltdown.desc":"Доведи головний реактор до meltdown.","ach.shutdown.name":"Успішна аварійна зупинка","ach.shutdown.desc":"Заверши аварійну зупинку й збережи реактор у безпеці.","ach.surface.name":"Втеча на поверхню","ach.surface.desc":"Переживи meltdown, freezedown або ESDP, вибравшись на Поверхню.","ach.bunkerB.name":"Втеча в бункер Бета","ach.bunkerB.desc":"Переживи meltdown, freezedown або ESDP в Аварійному бункері Бета.","ach.bunkerA.name":"Втеча в бункер Альфа","ach.bunkerA.desc":"Переживи meltdown, freezedown або ESDP в Аварійному бункері Альфа.","ach.freezedown.name":"Freezedown","ach.freezedown.desc":"Дай ядру замерзнути нижче −165 °C.","ach.burndown.name":"Burndown","ach.burndown.desc":"Дай ядру розжаритися понад 6 000 °C.","ach.esdp.name":"ESDP","ach.esdp.desc":"Активуй аварійний протокол самознищення (ESDP).","ach.heli.name":"Втеча гелікоптером","ach.heli.desc":"Утечи від burndown на евакуаційному гелікоптері.","cred.title":"Автори","cred.idea":"Ідея й дизайн гри","cred.ideaV":"Директор комплексу C.A.M.","cred.prog":"Програмування","cred.progV":"Зроблено з Claude","cred.fonts":"Шрифти","cred.sound":"Звук","cred.soundV":"Створюється наживо у твоєму браузері","cred.lang":"Мови","cred.langV":"Англійська, українська, італійська, британська англійська, французька","cred.thanks":"Особлива подяка","cred.thanksV":"Кожному операторові, який дістався до безпеки","exit.title":"Системи вимкнено","exit.text":"Комплекс на сьогодні зачинено. Можеш закрити цю вкладку.","exit.back":"Назад у меню","res.time":"Час зміни","res.earned":"Зароблено монет","res.bonus":"Бонус за втечу","res.new":"Нова зміна","res.menu":"Головне меню","res.flew":"Ти відлетів","res.bunker":"Ти вцілів у бункері","res.escaped":"Ти втік","res.heliText":"До вильоту лишалося {n} с, коли ти опинився на борту аварійного евакуаційного гелікоптера C.A.M. Двоє пілотів злетіли, а внизу ядро пропалювало комплекс.","res.bunkerText":"До вибуху лишалося {n} с, коли за тобою зачинилися двері. Укриття: {place}. {blast}, але бункер витримав. Наступного ранку рятувальники тебе відкопали.","res.surfText":"До вибуху лишалося {n} с, коли ти вибрався на Поверхню. {blast}","res.fail.meltdown.t":"Комплекс втрачено","res.fail.meltdown.d":"Головний реактор вибухнув раніше, ніж ти дістався до безпеки. Наступного разу біжи на Поверхню або в аварійний бункер, щойно завиють сирени.","res.fail.freezedown.t":"Замерз намертво","res.fail.freezedown.d":"Головний реактор вибухнув крижаним вибухом раніше, ніж ти дістався до безпеки. Наступного разу біжи на Поверхню або в аварійний бункер, щойно спрацюють сигнали замерзання.","res.fail.esdp.t":"Самознищення","res.fail.esdp.d":"Ядро ESDP вибухнуло раніше, ніж ти дістався до безпеки. Наступного разу біжи на Поверхню або в аварійний бункер одразу після активації ESDP.","res.fail.burndown.t":"Згорів","res.fail.burndown.d":"Евакуаційний гелікоптер відлетів із головних гелімайданчиків без тебе, і ядро пропалило комплекс. Наступного разу одразу біжи до гелімайданчиків на Поверхні.","blast.meltdown.far":"Головний реактор вибухнув глибоко під тобою.","blast.meltdown.bunk":"Увесь комплекс здригнувся","blast.freezedown.far":"Головний реактор вибухнув крижаним вибухом глибоко під тобою й укрив комплекс льодом.","blast.freezedown.bunk":"Крижаний вибух перетворив комплекс на лід","blast.esdp.far":"Ядро ESDP вибухнуло глибоко під тобою й знищило весь комплекс.","blast.esdp.bunk":"Вибух ядра ESDP рознів увесь комплекс","hud.loc":"Місце","hud.reactor":"Реактор","hud.temp":"Темп. ядра","hud.stab":"Стабільність","hud.out":"Потужність","hud.menu":"Меню","hud.cont":"Утримання","st.offline":"ВИМКНЕНО","st.online":"ПРАЦЮЄ","st.warning":"УВАГА","st.shutdown":"АВАРІЙНА ЗУПИНКА","cr.title":"Головна диспетчерська · вигляд у камеру реактора","cr.order":"Порядок запуску","side.map":"Мапа комплексу","side.remote":"Реактор (віддалені показники)","side.main":"Головний реактор","side.cont":"Утримання","side.lasers":"Лазери","side.glass":"Скляні двері","side.cool":"Охолодження","side.log":"Журнал подій","ro.overdrive":"ФОРСАЖ","ro.extended":"ВИСУНУТО","ro.retracted":"СХОВАНО","ro.moving":"РУХАЮТЬСЯ","ro.closed":"ЗАЧИНЕНО","ro.open":"ВІДЧИНЕНО","sec.surface.name":"Поверхня","sec.surface.tag":"Рівень 0","sec.surface.desc":"Головні гелімайданчики, пост охорони й верх ліфтових шахт. Відкрите небо й холодний вітер. Під час аварії тобі треба саме сюди.","sec.A.name":"Сектор A","sec.A.tag":"Рівень −1","sec.A.desc":"Приймальня й пропускний пункт охорони. Ліфти ведуть униз, до дослідницьких рівнів.","sec.B.name":"Сектор B","sec.B.tag":"Рівень −2","sec.B.desc":"Лабораторії калібрування лазерів. Уздовж стін — запасні лінзи й деталі випромінювачів.","sec.C.name":"Сектор C","sec.C.tag":"Рівень −2","sec.C.desc":"Житлові кімнати й їдальня для науковців.","sec.D.name":"Сектор D","sec.D.tag":"Рівень −3","sec.D.desc":"Насосна станція охолодження. Велетенські труби гудуть, женучи холодну воду до реактора.","sec.bunkerA.name":"Аварійний бункер Альфа","sec.bunkerA.tag":"Сектор D · укриття","sec.bunkerA.desc":"Вибухостійке укриття за сталевими дверима завтовшки в метр, із балонами повітря, водою й ліжками. Тут можна пережити meltdown, freezedown або ESDP.","sec.bunkerB.name":"Аварійний бункер Бета","sec.bunkerB.tag":"Сектор B · укриття","sec.bunkerB.desc":"Вибухостійке укриття, вирите в скелі під лазерними лабораторіями. Товсті стіни, аварійне світло й запаси на довге чекання. Тут можна пережити meltdown, freezedown або ESDP.","sec.zero.name":"Секція Нуль","sec.zero.tag":"Рівень −4","sec.zero.desc":"Стара випробувальна камера першого покоління, запечатана ще з перших днів комплексу.","sec.epsilon.name":"Секція Епсилон","sec.epsilon.tag":"Рівень −5","sec.epsilon.desc":"Вузол розподілу енергії. Товсті кабелі несуть енергію від реактора по всьому комплексу. За запечатаними дверима — головна диспетчерська ESDP, аварійного протоколу самознищення.","sec.main.name":"Головна секція","sec.main.tag":"Рівень −6","sec.main.desc":"Тут стоїть головний реактор. З Головної диспетчерської видно камеру реактора крізь захисні скляні двері.","map.surface":"ПОВЕРХНЯ","map.A":"СЕКТОР A","map.B":"СЕКТОР B","map.C":"СЕКТОР C","map.D":"СЕКТОР D","map.bunkerA":"БУНКЕР АЛЬФА","map.bunkerB":"БУНКЕР БЕТА","map.zero":"НУЛЬ","map.epsilon":"ЕПСИЛОН","map.main":"ГОЛОВНА","travel.moving":"Перехід: {place}…","route.collapsed":"(обвал)","act.search":"Пошукати запаси","act.searched":"Обшукано · знову через {n} с","act.end":"Завершити зміну й піти додому","act.esdpEnter":"Увійти в головну диспетчерську ESDP","act.esdpLeave":"Вийти з головної диспетчерської ESDP","act.padGo":"Йти до головних гелімайданчиків","act.padGoing":"Ідеш до головних гелімайданчиків…","act.board":"Сісти в евакуаційний гелікоптер","act.wait":"Чекаєш на гелікоптер на головних гелімайданчиках…","esdp.title":"Головна диспетчерська ESDP · Секція Епсилон","esdp.core":"Ядро ESDP","esdp.text":"Аварійний протокол самознищення має власне ядро, окреме від головного реактора. Після активації ядро ESDP вибухне за 2 хвилини й знищить увесь комплекс. Зупинити його не можна.","esdp.arm":"Взвести ESDP","esdp.disarm":"Зняти ESDP із взводу","esdp.armKey":"поверни ключ взведення","esdp.armTurned":"ключ повернуто","esdp.locked":"заблоковано","esdp.activate":"Активувати ESDP","esdp.armFirst":"спершу взведи","esdp.ready":"готово","esdp.activated":"активовано · зупинити не можна","esdp.standby":"ОЧІКУВАННЯ","esdp.armed":"ВЗВЕДЕНО","esdp.detonating":"ДЕТОНАЦІЯ","esdp.charge0":"Заряд 0%","esdp.charge":"Заряд {p}% · вибух через {t}","p.contain.on":"Вимкнути поле утримання","p.contain.off":"Запустити поле утримання","p.ext.on":"Сховати всі лазери й зачинити дверцята","p.ext.off":"Висунути всі лазери","p.ext.extended":"висунуто","p.ext.retracted":"сховано","p.ext.extending":"висуваються…","p.ext.retracting":"ховаються…","p.stab":"Стабілізаційні лазери · ліві / праві","p.energy":"Енергетичні лазери · верхні / нижні","p.power":"Силові лазери · кутові","p.glass.on":"Відчинити захисні скляні двері","p.glass.off":"Зачинити захисні скляні двері","p.glass.closed":"зачинено","p.glass.open":"відчинено","p.glass.closing":"зачиняються…","p.glass.opening":"відчиняються…","p.pumps":"Насоси охолодження","p.od":"Форсаж охолодження","p.odOn":"УВІМК · швидке охолодження","p.odNeeds":"потрібні насоси охолодження","p.main.on":"Вимкнути головне живлення","p.main.off":"Головний запуск","p.emerg":"Аварійна зупинка","p.emergProg":"триває · {n} с","p.emergIdle":"зупиняє все","p.doorsClosed":"лазерні дверцята зачинені","ck.pumps":"Насоси охолодження працюють","ck.contain":"Поле утримання ввімкнено","ck.ext":"Усі лазери висунуто","ck.stab":"Стабілізаційні лазери ввімкнено","ck.energy":"Енергетичні лазери ввімкнено","ck.power":"Силові лазери ввімкнено","ck.glass":"Захисні скляні двері зачинено","ck.main":"Головний запуск","ln.energy":"Енергетичні лазери","ln.stab":"Стабілізаційні лазери","ln.power":"Силові лазери","log.start":"Зміну розпочато. Ти в Головній диспетчерській.","log.collapsedWay":"Шлях до: {place} — завалено. Шукай інший маршрут.","log.bunkerBurn":"Двері бункера не витримають burndown! Біжи до головних гелімайданчиків на Поверхні!","log.surfaceBurn":"Ти на Поверхні. Біжи до головних гелімайданчиків!","log.found":"Знайдено сині монети ({place}): +{n}.","log.esdpEnter":"Ти увійшов у головну диспетчерську ESDP.","log.padRun":"Біжиш до головних гелімайданчиків…","log.board":"Ти на борту. Пілоти злітають!","log.esdpActiveKey":"ESDP активовано. Ключ взведення заблоковано.","log.esdpLocked":"Під час аварії ESDP заблоковано. Евакуюйся!","log.esdpArmed":"ESDP взведено. Натисни «Активувати ESDP», щоб запустити самознищення.","log.esdpDisarmed":"ESDP знято із взводу.","log.esdpAlready":"ESDP уже активовано. Евакуюйся!","log.esdpArmFirst":"Спершу взведи ESDP.","log.shutFail":"Аварійна зупинка не вдалася. {ev} не зупинити. Евакуюйся!","log.noControl":"Керування не відповідає. Евакуюйся!","log.shutLocked":"Триває аварійна зупинка. Керування заблоковано.","log.contOn":"Поле утримання запускається.","log.contOffRun":"Поле утримання вимкнено, коли реактор працює!","log.contOff":"Поле утримання вимкнено.","log.mainNoCont":"Головний запуск без поля утримання! Ядро нестабільне!","log.mainGlass":"Головний запуск із відчиненими захисними скляними дверима.","log.mainOk":"Головний запуск. Реактор вмикається.","log.mainDown":"Головний реактор вимикається.","log.glassClose":"Захисні скляні двері зачиняються.","log.glassOpen":"Захисні скляні двері відчиняються.","log.extOff":"Усі лазери вимкнено. Лазери ховаються, дверцята зачиняються.","log.extOn":"Лазерні дверцята відчиняються, усі лазери висуваються.","log.laserDoors":"{laser}: лазерні дверцята зачинені. Спершу висунь усі лазери.","log.powerNoStab":"Силові лазери ввімкнено без стабілізаційних! Стабільність падає!","log.laserOn":"{laser}: увімкнено.","log.laserOff":"{laser}: вимкнено.","log.pumpsStopRun":"Насоси охолодження зупинено, коли реактор працює! Ядро перегріється!","log.pumpsStop":"Насоси охолодження зупинено.","log.pumpsOn":"Насоси охолодження працюють.","log.odNeeds":"Для форсажу охолодження мають працювати насоси охолодження.","log.odOn":"Форсаж охолодження ввімкнено. Ядро швидко холоне — не дай йому замерзнути.","log.odOff":"Форсаж охолодження вимкнено.","log.emerg":"АВАРІЙНА ЗУПИНКА. Усі лазери вимкнено, реактор зупиняється, скляні двері зачиняються.","log.event":"{ev}: {reason}","why.meltdown":"ядро повністю втратило стабільність.","why.burndown":"ядро розжарилося понад 6 000 °C.","why.freezedown":"ядро охололо нижче −165 °C.","why.esdp":"активовано аварійний протокол самознищення. Ядро ESDP вибухне за 2 хвилини.","log.debris":"Уламки завалили прохід: {place}. Шукай інший шлях!","log.heliComing":"Аварійний евакуаційний гелікоптер C.A.M. летить до головних гелімайданчиків. Сяде за 30 секунд.","log.heliLanded":"Евакуаційний гелікоптер сів на головних гелімайданчиках. Двоє пілотів чекають. Він відлітає за 30 секунд!","log.atPad":"Ти на головних гелімайданчиках.","log.heliGone":"Евакуаційний гелікоптер відлетів без тебе.","log.surge":"У ядрі виявлено плазмовий сплеск.","log.hot":"Ядро перегрівається! Знову ввімкни насоси охолодження!","log.cold":"Ядро замерзає! Вимкни форсаж охолодження!","log.shutDone":"Аварійну зупинку завершено. Реактор у безпеці.","ev.burnComing":"Біжи до головних гелімайданчиків на Поверхні! Евакуаційний гелікоптер сяде через {n} с. Бункери не витримають burndown. Обвал: {place}.","ev.burnLanded":"Евакуаційний гелікоптер на головних гелімайданчиках! Він відлітає через {n} с — сідай негайно.","ev.esdp":"Ядро ESDP вибухне через {t}. Біжи на Поверхню або в аварійний бункер!","ev.freezePre":"Ядро замерзає намертво. ","ev.escape":"Біжи на Поверхню або в аварійний бункер! Обвал: {place}, тож {bunker} тепер недосяжний — шукай інший маршрут.","cnt.lands":"сяде через {n} с","cnt.leaves":"відлетить через {n} с","crew.chief.role":"Керує рятувальною командою. Однаково добре робить усе.","crew.digger.role":"Фахівець із розкопок. Швидко копає, але повільно справляється з важкими дверима.","crew.eng.role":"Інженер броньованих дверей. Швидко відчиняє двері, а копає трохи повільніше.","crew.dig":"Копання","crew.doors":"Двері","af.skip":"Пропустити наслідки","af.title.heli":"Головні гелімайданчики","af.title.road":"Головна дорога","af.title.rescue":"Порятунок: {place}","af.eb.heli":"Наслідки · евакуація під час Burndown","af.eb.surf":"Наслідки · {ev} · втеча на поверхню","af.eb.bunk":"Наслідки · {ev} · Аварійно-рятувальний корпус C.A.M.","af.h.walkHeli":"Ядро пропалює комплекс. Тримай «Іти» (або клавішу →), щоб бігти до евакуаційного гелікоптера.","af.h.walk":"Реактора більше немає. Тримай «Іти» (або клавішу →), щоб пройти головною дорогою до головних воріт.","af.h.liftoff":"Ти на борту. Двоє пілотів злітають із головних гелімайданчиків…","af.h.pick":"Аварійно-рятувальний корпус C.A.M. прибув на місце: {place}. Обери рятувальника, за якого гратимеш.","af.h.dig":"Натискай «Копати» (або пробіл), щоб розчистити завал до дверей бункера.","af.h.walkdoor":"Двері бункера розчищено. Ідемо до штурвала дверей…","af.h.door":"Тримай «Відчинити двері» (або пробіл), щоб крутити штурвал дверей.","af.h.opening":"Броньовані двері відчиняються…","af.h.rescue":"Оператор живий!","af.b.walk":"Іти ▶","af.b.dig":"Копати","af.b.open":"Відчинити двері","af.found":"Оператора знайдено живим!","af.rubble":"ЗАВАЛ РОЗЧИЩЕНО","af.wheel":"ШТУРВАЛ ДВЕРЕЙ","af.f.gates":"Ти вийшов крізь головні ворота.","af.f.frozen":"Комплекс C.A.M. замерз намертво, але ти вцілів.","af.f.gone":"Комплексу C.A.M. більше немає, але ти вцілів.","af.f.rescue":"Порятунок завершено.","af.f.rescueSub":"Вцілілий оператор ({place}) у безпеці з рятувальниками.","af.f.heli":"Гелікоптер забрав тебе звідти.","af.f.heliSub":"Унизу ядро пропалювало комплекс C.A.M."},"it":{"menu.subtitle":"Centro principale di ricerca energetica","menu.play":"Gioca","menu.start":"inizia il turno","menu.resume":"riprendi il turno","menu.tutorial":"Tutorial","menu.language":"Lingua","menu.settings":"Impostazioni","menu.shop":"Negozio","menu.ach":"Obiettivi","menu.credits":"Riconoscimenti","menu.exit":"Esci","menu.reactor":"Reattore CAM-R1","menu.build":"Versione 0.2","common.back":"Indietro","common.on":"ON","common.off":"OFF","lang.title":"Lingua","lang.intro":"Scegli la lingua del gioco.","tut.title":"Tutorial","tut.intro":"Benvenuto, operatore. Qui trovi tutto ciò che ti serve per gestire il Centro principale di ricerca energetica C.A.M. e uscirne vivo.","tut.startup.h":"1 · Come avviare il reattore","tut.startup.b":"<p>Vai nella Sezione Principale. La Sala di controllo principale ha il pannello di controllo e una finestra sulla camera del reattore. Premi i pulsanti in questo ordine:<\/p><ol><li><b>Pompe di raffreddamento<\/b> — lasciale accese (all'inizio del turno sono già accese).<\/li><li><b>Avvia campo di contenimento<\/b> — aspetta che il campo arrivi al 100%.<\/li><li><b>Estendi tutti i laser<\/b> — le porte dei laser si aprono e i laser escono.<\/li><li><b>Laser di stabilizzazione<\/b> (sinistra / destra) — accendili sempre prima dei laser di potenza.<\/li><li><b>Laser di energia<\/b> (sopra / sotto).<\/li><li><b>Laser di potenza<\/b> (angoli).<\/li><li><b>Chiudi le porte protettive di vetro<\/b>.<\/li><li><b>Avvio principale<\/b>.<\/li><\/ol><p>La lista dell'ordine di avvio sotto il pannello spunta ogni passaggio. Se fai tutti i passaggi prima dell'avvio principale, sblocchi l'obiettivo Avvio principale riuscito.<\/p>","tut.control.h":"2 · Come controllare il reattore","tut.control.b":"<ul><li><b>Temp. nucleo<\/b> — in condizioni normali è di circa 2.000–2.500 °C. Troppo caldo o troppo freddo fa partire un'emergenza.<\/li><li><b>Stabilità<\/b> — tienila alta. I laser di potenza senza i laser di stabilizzazione, o senza campo di contenimento, la fanno scendere.<\/li><li><b>Contenimento<\/b> — il campo intorno al nucleo. Tienilo al 100% mentre il reattore è acceso.<\/li><li><b>Produzione<\/b> — l'energia che produci. Più produzione significa più monete blu.<\/li><li>Le <b>Pompe di raffreddamento<\/b> raffreddano il nucleo. Il <b>Raffreddamento turbo<\/b> lo raffredda molto più in fretta, ma abbassa la produzione.<\/li><li>L'<b>Arresto di emergenza<\/b> spegne tutto e mette in sicurezza il reattore in 8 secondi.<\/li><li>Ogni tanto arrivano dei picchi di plasma. I laser di stabilizzazione li rendono molto più deboli.<\/li><\/ul>","tut.log.h":"3 · Tieni d'occhio il registro eventi","tut.log.b":"<p>Il registro eventi a destra mostra tutto quello che succede, con l'ora del turno. Il colore indica quanto è grave:<\/p><ul><li><span class=\"tg good\">Verde<\/span> — buone notizie.<\/li><li><span class=\"tg info\">Bianco<\/span> — informazioni normali.<\/li><li><span class=\"tg warn\">Ambra<\/span> — un avviso. Qualcosa richiede la tua attenzione.<\/li><li><span class=\"tg err\">Rosso<\/span> — pericolo. Agisci subito.<\/li><\/ul><p>Il reattore continua a funzionare mentre giri per il centro, quindi controlla spesso il registro e la lettura a distanza.<\/p>","tut.events.h":"4 · Gli eventi","tut.events.b":"<ul><li><b>MELTDOWN<\/b> — il nucleo perde tutta la stabilità. Hai 45 secondi per scappare.<\/li><li><b>FREEZEDOWN<\/b> — il nucleo scende sotto i −165 °C (per esempio, se lasci acceso il raffreddamento turbo a reattore spento). Finisce con un'esplosione gelida. Hai 45 secondi per scappare.<\/li><li><b>BURNDOWN<\/b> — il nucleo supera i 6.000 °C (per esempio, se spegni le pompe di raffreddamento a reattore acceso). Solo l'elicottero di evacuazione può salvarti.<\/li><li><b>ESDP<\/b> — l'autodistruzione che avvii tu stesso. Hai 2 minuti per scappare.<\/li><\/ul><p>Durante un evento il pannello di controllo smette di funzionare e un settore può crollare, quindi devi trovare un'altra strada.<\/p>","tut.escape.h":"5 · Come fuggire in caso di emergenza","tut.escape.b":"<ul><li><b>Sezione Superficie<\/b> — risali attraverso i settori fino alla superficie. Funziona per Meltdown, Freezedown ed ESDP.<\/li><li><b>Bunker di emergenza Alpha<\/b> (dal Settore D) e <b>Bunker di emergenza Beta<\/b> (dal Settore B) — chiuditi dentro. Funziona per Meltdown, Freezedown ed ESDP. Un settore crollato può tagliarti fuori da un bunker.<\/li><li><b>Elicottero di evacuazione<\/b> — solo nel Burndown. Vai nella Sezione Superficie, premi <i>Vai agli eliporti principali<\/i> e aspetta. L'elicottero con due piloti atterra 30 secondi dopo l'inizio del Burndown e riparte 30 secondi dopo. Premi <i>Sali sull'elicottero di evacuazione<\/i> in tempo.<\/li><\/ul><p>I pulsanti verdi dei percorsi ti mostrano la via per la salvezza. Dopo la fuga puoi giocare l'epilogo o premere <i>Salta l'epilogo<\/i>.<\/p>","tut.esdp.h":"6 · L'ESDP","tut.esdp.b":"<p>Il protocollo di autodistruzione d'emergenza (ESDP) ha un suo nucleo, separato dal reattore principale. Per usarlo:<\/p><ol><li>Vai nella <b>Sezione Epsilon<\/b> e premi <i>Entra nella sala di controllo ESDP<\/i>.<\/li><li>Premi <b>Arma l'ESDP<\/b> per girare la chiave di armamento.<\/li><li>Premi <b>Attiva l'ESDP<\/b>.<\/li><\/ol><p>Il nucleo dell'ESDP esplode dopo 2 minuti e distrugge tutto il centro. Non si può fermare, quindi corri subito verso la Sezione Superficie o un bunker.<\/p>","set.title":"Impostazioni","set.sound":"Suono","set.soundD":"Ronzio del reattore, pulsanti e allarmi.","set.vol":"Volume","set.volD":"Volume generale.","set.shake":"Tremolio schermo","set.shakeD":"Fa tremare lo schermo durante un'emergenza.","set.check":"Lista di avvio","set.checkD":"Mostra l'ordine di avvio nella Sala di controllo principale.","set.reset":"Azzera i progressi","set.resetD":"Cancella tutte le monete blu, gli oggetti del negozio e gli obiettivi.","set.resetBtn":"Azzera","set.resetConfirm":"Tocca di nuovo per confermare","set.resetDone":"Progressi azzerati","shop.title":"Negozio","shop.coins":"monete blu","shop.intro":"Guadagni monete blu facendo funzionare il reattore e scappando dalle emergenze. Le monete blu si usano solo nel gioco.","shop.buy":"Compra · {n} monete","shop.equip":"Usa","shop.equipped":"In uso","shop.owned":"Già tuo","shop.cat.laser":"Colori dei laser","shop.cat.core":"Nucleo del reattore","shop.cat.up":"Potenziamenti","shop.laser_default.name":"Dotazione standard","shop.laser_default.desc":"Laser di energia ciano, di stabilizzazione verdi e di potenza ambra.","shop.laser_crimson.name":"Set Cremisi","shop.laser_crimson.desc":"Raggi rosso fuoco per ogni gruppo di laser.","shop.laser_violet.name":"Set Viola","shop.laser_violet.desc":"Raggi viola e indaco.","shop.laser_gold.name":"Set Oro","shop.laser_gold.desc":"Raggi d'oro brillante. Luccicano tantissimo.","shop.core_default.name":"Plasma blu","shop.core_default.desc":"Il nucleo al plasma standard del CAM-R1.","shop.core_green.name":"Plasma verde","shop.core_green.desc":"Una miscela sperimentale di plasma verde.","shop.core_solar.name":"Nucleo solare","shop.core_solar.desc":"Brucia come un piccolo sole.","shop.core_void.name":"Nucleo del vuoto","shop.core_void.desc":"Un nucleo scuro con un bordo viola.","shop.up_shoes.name":"Scarpe da corsa","shop.up_shoes.desc":"Ti sposti tra le sezioni il 30% più in fretta.","shop.up_coolant.name":"Raffreddamento migliorato","shop.up_coolant.desc":"Il reattore lavora a circa 240 °C in meno.","shop.up_shield.name":"Paratie rinforzate","shop.up_shield.desc":"+15 secondi per scappare durante un Meltdown o un Freezedown.","ach.title":"Obiettivi","ach.summary":"{n} su {total} sbloccati.","ach.unlocked":"Sbloccato il {date}","ach.toast":"Obiettivo sbloccato","ach.startup.name":"Avvio principale riuscito","ach.startup.desc":"Avvia il reattore principale dopo aver completato tutti i passaggi dell'ordine di avvio.","ach.meltdown.name":"Il Meltdown","ach.meltdown.desc":"Manda il reattore principale in Meltdown.","ach.shutdown.name":"Arresto di emergenza riuscito","ach.shutdown.desc":"Completa un arresto di emergenza e metti in sicurezza il reattore.","ach.surface.name":"Fuga in superficie","ach.surface.desc":"Sopravvivi a un Meltdown, un Freezedown o all'ESDP raggiungendo la Sezione Superficie.","ach.bunkerB.name":"Fuga nel Bunker Beta","ach.bunkerB.desc":"Sopravvivi a un Meltdown, un Freezedown o all'ESDP dentro il Bunker di emergenza Beta.","ach.bunkerA.name":"Fuga nel Bunker Alpha","ach.bunkerA.desc":"Sopravvivi a un Meltdown, un Freezedown o all'ESDP dentro il Bunker di emergenza Alpha.","ach.freezedown.name":"Il Freezedown","ach.freezedown.desc":"Lascia che il nucleo geli sotto i −165 °C.","ach.burndown.name":"Il Burndown","ach.burndown.desc":"Lascia che il nucleo bruci oltre i 6.000 °C.","ach.esdp.name":"L'ESDP","ach.esdp.desc":"Attiva il protocollo di autodistruzione d'emergenza (ESDP).","ach.heli.name":"Fuga in elicottero","ach.heli.desc":"Sfuggi a un Burndown con l'elicottero di evacuazione.","cred.title":"Riconoscimenti","cred.idea":"Idea e design del gioco","cred.ideaV":"Direttore del centro C.A.M.","cred.prog":"Programmazione","cred.progV":"Realizzato con Claude","cred.fonts":"Caratteri","cred.sound":"Suono","cred.soundV":"Generato dal vivo nel tuo browser","cred.lang":"Lingue","cred.langV":"Inglese, ucraino, italiano, inglese britannico, francese","cred.thanks":"Ringraziamenti speciali","cred.thanksV":"A ogni operatore che è riuscito a mettersi in salvo","exit.title":"Sistemi spenti","exit.text":"Il centro per oggi è chiuso. Ora puoi chiudere questa scheda.","exit.back":"Torna al menu","res.time":"Durata del turno","res.earned":"Monete guadagnate","res.bonus":"Bonus fuga","res.new":"Nuovo turno","res.menu":"Menu principale","res.flew":"Sei volato via","res.bunker":"Sei sopravvissuto nel bunker","res.escaped":"Sei scappato","res.heliText":"Sei salito sull'elicottero di evacuazione d'emergenza C.A.M. con {n} secondi di margine. I due piloti sono decollati mentre il nucleo bruciava il centro sotto di voi.","res.bunkerText":"Ti sei chiuso nel {place} con {n} secondi di margine. {blast}, ma il bunker ha resistito. Le squadre di soccorso ti hanno tirato fuori la mattina dopo.","res.surfText":"Hai raggiunto la Sezione Superficie con {n} secondi di margine. {blast}","res.fail.meltdown.t":"Centro perduto","res.fail.meltdown.d":"Il reattore principale è esploso prima che tu fossi al sicuro. La prossima volta, corri verso la Sezione Superficie o un bunker di emergenza appena partono gli allarmi.","res.fail.freezedown.t":"Congelato","res.fail.freezedown.d":"Il reattore principale è scoppiato in un'esplosione gelida prima che tu fossi al sicuro. La prossima volta, corri verso la Sezione Superficie o un bunker di emergenza appena partono gli allarmi del gelo.","res.fail.esdp.t":"Autodistrutto","res.fail.esdp.d":"Il nucleo dell'ESDP è esploso prima che tu fossi al sicuro. La prossima volta, corri verso la Sezione Superficie o un bunker di emergenza subito dopo aver attivato l'ESDP.","res.fail.burndown.t":"Bruciato","res.fail.burndown.d":"L'elicottero di evacuazione è partito dagli eliporti principali senza di te, e il nucleo ha bruciato tutto il centro. La prossima volta, vai dritto agli eliporti nella Sezione Superficie.","blast.meltdown.far":"Il reattore principale è esploso molto più in basso.","blast.meltdown.bunk":"Tutto il centro ha tremato","blast.freezedown.far":"Il reattore principale è scoppiato in un'esplosione gelida molto più in basso e ha coperto il centro di ghiaccio.","blast.freezedown.bunk":"Un'esplosione gelida ha trasformato il centro in ghiaccio","blast.esdp.far":"Il nucleo dell'ESDP è esploso molto più in basso e ha distrutto tutto il centro.","blast.esdp.bunk":"L'esplosione del nucleo dell'ESDP ha squarciato tutto il centro","hud.loc":"Posizione","hud.reactor":"Reattore","hud.temp":"Temp. nucleo","hud.stab":"Stabilità","hud.out":"Produzione","hud.menu":"Menu","hud.cont":"Contenimento","st.offline":"SPENTO","st.online":"ATTIVO","st.warning":"ATTENZIONE","st.shutdown":"ARRESTO DI EMERGENZA","cr.title":"Sala di controllo principale · vista sulla camera del reattore","cr.order":"Ordine di avvio","side.map":"Mappa del centro","side.remote":"Reattore (lettura a distanza)","side.main":"Reattore principale","side.cont":"Contenimento","side.lasers":"Laser","side.glass":"Porte di vetro","side.cool":"Raffreddamento","side.log":"Registro eventi","ro.overdrive":"TURBO","ro.extended":"ESTESI","ro.retracted":"RITIRATI","ro.moving":"IN MOVIMENTO","ro.closed":"CHIUSE","ro.open":"APERTE","sec.surface.name":"Sezione Superficie","sec.surface.tag":"Livello 0","sec.surface.desc":"Eliporti principali, posto di guardia e la cima dei pozzi degli ascensori. Cielo aperto e vento freddo. In caso di emergenza, è qui che devi essere.","sec.A.name":"Settore A","sec.A.tag":"Livello −1","sec.A.desc":"Accoglienza e posto di controllo di sicurezza. Gli ascensori portano giù ai livelli di ricerca.","sec.B.name":"Settore B","sec.B.tag":"Livello −2","sec.B.desc":"Laboratori di calibrazione dei laser. Lungo le pareti ci sono lenti di ricambio e pezzi degli emettitori.","sec.C.name":"Settore C","sec.C.tag":"Livello −2","sec.C.desc":"Alloggi e mensa per il personale di ricerca.","sec.D.name":"Settore D","sec.D.tag":"Livello −3","sec.D.desc":"Stazione di pompaggio del refrigerante. Enormi tubi ronzano pieni di acqua gelata diretta al reattore.","sec.bunkerA.name":"Bunker di emergenza Alpha","sec.bunkerA.tag":"Settore D · rifugio","sec.bunkerA.desc":"Un rifugio antiesplosione dietro una porta d'acciaio spessa un metro, con bombole d'aria, acqua e letti a castello. In un Meltdown, un Freezedown o con l'ESDP, qui dentro puoi sopravvivere.","sec.bunkerB.name":"Bunker di emergenza Beta","sec.bunkerB.tag":"Settore B · rifugio","sec.bunkerB.desc":"Un rifugio antiesplosione scavato nella roccia sotto i laboratori dei laser. Muri spessi, luci di emergenza e scorte per una lunga attesa. In un Meltdown, un Freezedown o con l'ESDP, qui dentro puoi sopravvivere.","sec.zero.name":"Sezione Zero","sec.zero.tag":"Livello −4","sec.zero.desc":"La vecchia camera di prova di prima generazione, sigillata fin dai primi giorni del centro.","sec.epsilon.name":"Sezione Epsilon","sec.epsilon.tag":"Livello −5","sec.epsilon.desc":"Centro di distribuzione dell'energia. Grossi cavi portano l'energia dal reattore a tutto il centro. Dietro una porta sigillata c'è la sala di controllo principale dell'ESDP, il protocollo di autodistruzione d'emergenza.","sec.main.name":"Sezione Principale","sec.main.tag":"Livello −6","sec.main.desc":"Qui si trova il reattore principale. La Sala di controllo principale guarda nella camera del reattore attraverso le porte protettive di vetro.","map.surface":"SUPERFICIE","map.A":"SETTORE A","map.B":"SETTORE B","map.C":"SETTORE C","map.D":"SETTORE D","map.bunkerA":"BUNKER ALPHA","map.bunkerB":"BUNKER BETA","map.zero":"ZERO","map.epsilon":"EPSILON","map.main":"PRINCIPALE","travel.moving":"In viaggio verso {place}…","route.collapsed":"(crollato)","act.search":"Cerca rifornimenti","act.searched":"Già cercato · riprova tra {n}s","act.end":"Finisci il turno e torna a casa","act.esdpEnter":"Entra nella sala di controllo ESDP","act.esdpLeave":"Esci dalla sala di controllo ESDP","act.padGo":"Vai agli eliporti principali","act.padGoing":"Stai andando agli eliporti principali…","act.board":"Sali sull'elicottero di evacuazione","act.wait":"In attesa dell'elicottero agli eliporti principali…","esdp.title":"Sala di controllo ESDP · Sezione Epsilon","esdp.core":"Nucleo ESDP","esdp.text":"Il protocollo di autodistruzione d'emergenza ha un suo nucleo, separato dal reattore principale. Una volta attivato, il nucleo dell'ESDP esplode dopo 2 minuti e distrugge tutto il centro. Non si può fermare.","esdp.arm":"Arma l'ESDP","esdp.disarm":"Disarma l'ESDP","esdp.armKey":"gira la chiave di armamento","esdp.armTurned":"chiave di armamento girata","esdp.locked":"bloccato","esdp.activate":"Attiva l'ESDP","esdp.armFirst":"prima armalo","esdp.ready":"pronto","esdp.activated":"attivato · impossibile fermarlo","esdp.standby":"IN ATTESA","esdp.armed":"ARMATO","esdp.detonating":"DETONAZIONE","esdp.charge0":"Carica 0%","esdp.charge":"Carica {p}% · esplode tra {t}","p.contain.on":"Disattiva campo di contenimento","p.contain.off":"Avvia campo di contenimento","p.ext.on":"Ritira tutti i laser e chiudi le porte dei laser","p.ext.off":"Estendi tutti i laser","p.ext.extended":"estesi","p.ext.retracted":"ritirati","p.ext.extending":"in estensione…","p.ext.retracting":"in rientro…","p.stab":"Laser di stabilizzazione · sinistra / destra","p.energy":"Laser di energia · sopra / sotto","p.power":"Laser di potenza · angoli","p.glass.on":"Apri le porte protettive di vetro","p.glass.off":"Chiudi le porte protettive di vetro","p.glass.closed":"chiuse","p.glass.open":"aperte","p.glass.closing":"in chiusura…","p.glass.opening":"in apertura…","p.pumps":"Pompe di raffreddamento","p.od":"Raffreddamento turbo","p.odOn":"ON · raffredda veloce","p.odNeeds":"servono le pompe di raffreddamento","p.main.on":"Spegnimento principale","p.main.off":"Avvio principale","p.emerg":"Arresto di emergenza","p.emergProg":"in corso · {n}s","p.emergIdle":"ferma tutto","p.doorsClosed":"porte dei laser chiuse","ck.pumps":"Pompe di raffreddamento in funzione","ck.contain":"Campo di contenimento attivo","ck.ext":"Tutti i laser estesi","ck.stab":"Laser di stabilizzazione accesi","ck.energy":"Laser di energia accesi","ck.power":"Laser di potenza accesi","ck.glass":"Porte protettive di vetro chiuse","ck.main":"Avvio principale","ln.energy":"Laser di energia","ln.stab":"Laser di stabilizzazione","ln.power":"Laser di potenza","log.start":"Turno iniziato. Sei nella Sala di controllo principale.","log.collapsedWay":"La strada verso {place} è crollata. Trova un altro percorso.","log.bunkerBurn":"Le porte del bunker non reggeranno a un Burndown! Vai agli eliporti principali nella Sezione Superficie!","log.surfaceBurn":"Sezione Superficie raggiunta. Vai agli eliporti principali!","log.found":"Monete blu trovate ({place}): +{n}.","log.esdpEnter":"Sei entrato nella sala di controllo ESDP.","log.padRun":"Corri verso gli eliporti principali…","log.board":"Sei a bordo. I piloti stanno decollando!","log.esdpActiveKey":"L'ESDP è attivo. La chiave di armamento è bloccata.","log.esdpLocked":"Durante un'emergenza l'ESDP è bloccato. Evacuare!","log.esdpArmed":"ESDP armato. Premi Attiva l'ESDP per avviare l'autodistruzione.","log.esdpDisarmed":"ESDP disarmato.","log.esdpAlready":"L'ESDP è già attivo. Evacuare!","log.esdpArmFirst":"Prima arma l'ESDP.","log.shutFail":"Arresto di emergenza fallito. Impossibile fermare l'evento: {ev}. Evacuare!","log.noControl":"I comandi non rispondono. Evacuare!","log.shutLocked":"Arresto di emergenza in corso. I comandi sono bloccati.","log.contOn":"Avvio del campo di contenimento.","log.contOffRun":"Campo di contenimento disattivato con il reattore acceso!","log.contOff":"Campo di contenimento disattivato.","log.mainNoCont":"Avvio principale senza campo di contenimento! Il nucleo è instabile!","log.mainGlass":"Avvio principale con le porte protettive di vetro aperte.","log.mainOk":"Avvio principale. Il reattore si sta accendendo.","log.mainDown":"Spegnimento del reattore principale.","log.glassClose":"Chiusura delle porte protettive di vetro.","log.glassOpen":"Apertura delle porte protettive di vetro.","log.extOff":"Tutti i laser spenti. Rientro dei laser e chiusura delle porte dei laser.","log.extOn":"Apertura delle porte dei laser ed estensione di tutti i laser.","log.laserDoors":"{laser}: le porte dei laser sono chiuse. Prima estendi tutti i laser.","log.powerNoStab":"Laser di potenza accesi senza laser di stabilizzazione! La stabilità sta calando!","log.laserOn":"{laser}: accesi.","log.laserOff":"{laser}: spenti.","log.pumpsStopRun":"Pompe di raffreddamento ferme con il reattore acceso! Il nucleo si surriscalderà!","log.pumpsStop":"Pompe di raffreddamento ferme.","log.pumpsOn":"Pompe di raffreddamento in funzione.","log.odNeeds":"Il raffreddamento turbo ha bisogno delle pompe di raffreddamento in funzione.","log.odOn":"Raffreddamento turbo acceso. Il nucleo si raffredda in fretta — non lasciarlo congelare.","log.odOff":"Raffreddamento turbo spento.","log.emerg":"ARRESTO DI EMERGENZA. Tutti i laser spenti, reattore in spegnimento, porte di vetro in chiusura.","log.event":"{ev}: {reason}","why.meltdown":"il nucleo ha perso tutta la stabilità.","why.burndown":"il nucleo ha superato i 6.000 °C.","why.freezedown":"il nucleo è sceso sotto i −165 °C.","why.esdp":"è stato attivato il protocollo di autodistruzione d'emergenza. Il nucleo dell'ESDP esplode tra 2 minuti.","log.debris":"Le macerie hanno bloccato {place}. Trova un'altra strada!","log.heliComing":"Un elicottero di evacuazione d'emergenza C.A.M. sta arrivando agli eliporti principali. Atterra tra 30 secondi.","log.heliLanded":"L'elicottero di evacuazione è atterrato sugli eliporti principali. Due piloti ti aspettano. Riparte tra 30 secondi!","log.atPad":"Sei agli eliporti principali.","log.heliGone":"L'elicottero di evacuazione è decollato senza di te.","log.surge":"Picco di plasma rilevato nel nucleo.","log.hot":"Il nucleo si sta surriscaldando! Riaccendi le pompe di raffreddamento!","log.cold":"Il nucleo sta congelando! Spegni il raffreddamento turbo!","log.shutDone":"Arresto di emergenza completato. Il reattore è al sicuro.","ev.burnComing":"Vai agli eliporti principali nella Sezione Superficie! L'elicottero di evacuazione atterra tra {n}s. I bunker non resisteranno a un Burndown. Crollo: {place} è inagibile.","ev.burnLanded":"L'elicottero di evacuazione è sugli eliporti principali! Riparte tra {n}s — sali subito a bordo.","ev.esdp":"Il nucleo dell'ESDP esplode tra {t}. Raggiungi la Sezione Superficie o un bunker di emergenza!","ev.freezePre":"Il nucleo sta congelando del tutto. ","ev.escape":"Raggiungi la Sezione Superficie o un bunker di emergenza! Crollo: {place} è inagibile, quindi {bunker} non è raggiungibile — usa un altro percorso.","cnt.lands":"atterra tra {n}s","cnt.leaves":"riparte tra {n}s","crew.chief.role":"Guida la squadra di soccorso. Affidabile in ogni lavoro.","crew.digger.role":"Esperto di scavi. Scava in fretta, ma è lento con le porte pesanti.","crew.eng.role":"Ingegnere delle porte blindate. Apre le porte in fretta, scava un po' più lentamente.","crew.dig":"Scavo","crew.doors":"Porte","af.skip":"Salta l'epilogo","af.title.heli":"Gli eliporti principali","af.title.road":"La strada principale","af.title.rescue":"Soccorso al {place}","af.eb.heli":"Epilogo · Evacuazione dal Burndown","af.eb.surf":"Epilogo · {ev} · fuga in superficie","af.eb.bunk":"Epilogo · {ev} · Corpo di soccorso d'emergenza C.A.M.","af.h.walkHeli":"Il nucleo sta bruciando il centro. Tieni premuto Cammina (o il tasto →) per correre all'elicottero di evacuazione.","af.h.walk":"Il reattore non c'è più. Tieni premuto Cammina (o il tasto →) per seguire la strada principale fino ai cancelli principali.","af.h.liftoff":"Sei a bordo. I due piloti decollano dagli eliporti principali…","af.h.pick":"Il Corpo di soccorso d'emergenza C.A.M. è arrivato sopra il {place}. Scegli il soccorritore con cui vuoi giocare.","af.h.dig":"Tocca Scava (o premi Spazio) per togliere le macerie fino alle porte del bunker.","af.h.walkdoor":"Le porte del bunker sono libere. Vai verso il volante della porta…","af.h.door":"Tieni premuto Apri le porte (o Spazio) per girare il volante della porta.","af.h.opening":"La porta blindata si sta aprendo…","af.h.rescue":"L'operatore è vivo!","af.b.walk":"Cammina ▶","af.b.dig":"Scava","af.b.open":"Apri le porte","af.found":"Operatore trovato vivo!","af.rubble":"MACERIE RIMOSSE","af.wheel":"VOLANTE DELLA PORTA","af.f.gates":"Sei uscito dai cancelli principali.","af.f.frozen":"Il centro C.A.M. è tutto congelato, ma ce l'hai fatta.","af.f.gone":"Il centro C.A.M. non esiste più, ma ce l'hai fatta.","af.f.rescue":"Soccorso completato.","af.f.rescueSub":"Il sopravvissuto del {place} è al sicuro con la squadra di soccorso.","af.f.heli":"L'elicottero ti ha portato via.","af.f.heliSub":"Sotto di te, il nucleo ha bruciato il centro C.A.M."},"fr":{"menu.subtitle":"Centre principal de recherche énergétique","menu.play":"Jouer","menu.start":"commencer le service","menu.resume":"reprendre le service","menu.tutorial":"Tutoriel","menu.language":"Langue","menu.settings":"Paramètres","menu.shop":"Boutique","menu.ach":"Succès","menu.credits":"Crédits","menu.exit":"Quitter","menu.reactor":"Réacteur CAM-R1","menu.build":"Version 0.2","common.back":"Retour","common.on":"ON","common.off":"OFF","lang.title":"Langue","lang.intro":"Choisis la langue du jeu.","tut.title":"Tutoriel","tut.intro":"Bienvenue, opérateur. Voici tout ce qu'il te faut pour faire tourner le Centre principal de recherche énergétique C.A.M. et en sortir vivant.","tut.startup.h":"1 · Comment démarrer le réacteur","tut.startup.b":"<p>Va dans la Section principale. La Salle de contrôle principale contient le panneau de commande et une fenêtre sur la chambre du réacteur. Appuie sur les boutons dans cet ordre :<\/p><ol><li><b>Pompes de refroidissement<\/b> — laisse-les sur ON (elles sont allumées au début du service).<\/li><li><b>Démarrer le champ de confinement<\/b> — attends que le champ atteigne 100 %.<\/li><li><b>Déployer tous les lasers<\/b> — les portes laser s'ouvrent et les lasers sortent.<\/li><li><b>Lasers de stabilisation<\/b> (gauche / droite) — allume-les toujours avant les lasers de puissance.<\/li><li><b>Lasers d'énergie<\/b> (haut / bas).<\/li><li><b>Lasers de puissance<\/b> (coins).<\/li><li><b>Fermer les portes de protection en verre<\/b>.<\/li><li><b>Démarrage principal<\/b>.<\/li><\/ol><p>La liste de l'ordre de démarrage sous le panneau coche chaque étape. Si tu fais toutes les étapes avant le démarrage principal, tu débloques le succès Démarrage principal réussi.<\/p>","tut.control.h":"2 · Comment piloter le réacteur","tut.control.b":"<ul><li><b>Temp. du cœur<\/b> — en marche normale, environ 2 000–2 500 °C. Trop chaud ou trop froid, et c'est l'urgence.<\/li><li><b>Stabilité<\/b> — garde-la haute. Des lasers de puissance sans lasers de stabilisation, ou pas de champ de confinement, la font baisser.<\/li><li><b>Confinement<\/b> — le champ autour du cœur. Garde-le à 100 % tant que le réacteur tourne.<\/li><li><b>Production<\/b> — l'énergie que tu produis. Plus tu produis, plus tu gagnes de pièces bleues.<\/li><li>Les <b>pompes de refroidissement<\/b> refroidissent le cœur. Le <b>refroidissement turbo<\/b> le refroidit beaucoup plus vite, mais baisse la production.<\/li><li>L'<b>arrêt d'urgence<\/b> coupe tout et met le réacteur en sécurité en 8 secondes.<\/li><li>Des surtensions de plasma arrivent de temps en temps. Les lasers de stabilisation les rendent beaucoup plus faibles.<\/li><\/ul>","tut.log.h":"3 · Surveille le journal des événements","tut.log.b":"<p>Le journal des événements, à droite, affiche tout ce qui se passe, avec l'heure du service. La couleur indique la gravité :<\/p><ul><li><span class=\"tg good\">Vert<\/span> — bonne nouvelle.<\/li><li><span class=\"tg info\">Blanc<\/span> — information normale.<\/li><li><span class=\"tg warn\">Orange<\/span> — avertissement. Quelque chose demande ton attention.<\/li><li><span class=\"tg err\">Rouge<\/span> — danger. Agis tout de suite.<\/li><\/ul><p>Le réacteur continue de tourner pendant que tu te déplaces dans l'installation, alors regarde souvent le journal et l'affichage à distance.<\/p>","tut.events.h":"4 · Les événements","tut.events.b":"<ul><li><b>MELTDOWN<\/b> — le cœur perd toute stabilité. Tu as 45 secondes pour fuir.<\/li><li><b>FREEZEDOWN<\/b> — le cœur descend sous −165 °C (par exemple si le refroidissement turbo reste allumé quand le réacteur est éteint). Tout finit par une explosion glaciale. Tu as 45 secondes pour fuir.<\/li><li><b>BURNDOWN<\/b> — le cœur dépasse 6 000 °C (par exemple si les pompes de refroidissement sont coupées pendant que le réacteur tourne). Seul l'hélicoptère d'évacuation peut te sauver.<\/li><li><b>ESDP<\/b> — l'autodestruction que tu lances toi-même. Tu as 2 minutes pour fuir.<\/li><\/ul><p>Pendant un événement, le panneau de commande ne répond plus et un secteur peut s'effondrer : il faudra trouver un autre chemin.<\/p>","tut.escape.h":"5 · Comment s'échapper en cas d'urgence","tut.escape.b":"<ul><li><b>Section Surface<\/b> — remonte les secteurs jusqu'à la surface. Ça marche pour un meltdown, un freezedown et l'ESDP.<\/li><li><b>Bunker d'urgence Alpha<\/b> (depuis le Secteur D) et <b>Bunker d'urgence Bêta<\/b> (depuis le Secteur B) — enferme-toi dedans. Ça marche pour un meltdown, un freezedown et l'ESDP. Un secteur effondré peut couper l'accès à un bunker.<\/li><li><b>Hélicoptère d'évacuation<\/b> — seulement pendant un burndown. Va dans la Section Surface, appuie sur <i>Aller aux héliports principaux<\/i> et attends. L'hélicoptère et ses deux pilotes se posent 30 secondes après le début du burndown et repartent 30 secondes plus tard. Appuie à temps sur <i>Monter dans l'hélicoptère d'évacuation<\/i>.<\/li><\/ul><p>Les boutons d'itinéraire verts montrent le chemin vers la sécurité. Après ta fuite, tu peux jouer l'épilogue ou appuyer sur <i>Passer l'épilogue<\/i>.<\/p>","tut.esdp.h":"6 · L'ESDP","tut.esdp.b":"<p>Le protocole d'autodestruction d'urgence (ESDP) a son propre cœur, séparé du réacteur principal. Pour l'utiliser :<\/p><ol><li>Va dans la <b>Section Epsilon<\/b> et appuie sur <i>Entrer dans la salle de contrôle de l'ESDP<\/i>.<\/li><li>Appuie sur <b>Armer l'ESDP<\/b> pour tourner la clé d'armement.<\/li><li>Appuie sur <b>Activer l'ESDP<\/b>.<\/li><\/ol><p>Le cœur de l'ESDP explose au bout de 2 minutes et détruit toute l'installation. Impossible de l'arrêter, alors cours tout de suite vers la Section Surface ou un bunker.<\/p>","set.title":"Paramètres","set.sound":"Son","set.soundD":"Bourdonnement du réacteur, boutons et alarmes.","set.vol":"Volume","set.volD":"Volume général.","set.shake":"Tremblement de l'écran","set.shakeD":"Fait trembler l'écran pendant une urgence.","set.check":"Liste de démarrage","set.checkD":"Affiche l'ordre de démarrage dans la Salle de contrôle principale.","set.reset":"Réinitialiser la progression","set.resetD":"Supprime toutes les pièces bleues, les objets de la boutique et les succès.","set.resetBtn":"Réinitialiser","set.resetConfirm":"Touche encore pour confirmer","set.resetDone":"Progression réinitialisée","shop.title":"Boutique","shop.coins":"pièces bleues","shop.intro":"Gagne des pièces bleues en faisant tourner le réacteur et en t'échappant des urgences. Les pièces bleues servent uniquement dans le jeu.","shop.buy":"Acheter · {n} pièces","shop.equip":"Équiper","shop.equipped":"Équipé","shop.owned":"Acheté","shop.cat.laser":"Couleurs des lasers","shop.cat.core":"Cœur du réacteur","shop.cat.up":"Améliorations","shop.laser_default.name":"Modèle standard","shop.laser_default.desc":"Lasers d'énergie cyan, de stabilisation verts et de puissance orange.","shop.laser_crimson.name":"Set Écarlate","shop.laser_crimson.desc":"Des rayons rouge vif pour chaque groupe de lasers.","shop.laser_violet.name":"Set Violet","shop.laser_violet.desc":"Des rayons violets et indigo.","shop.laser_gold.name":"Set Doré","shop.laser_gold.desc":"Des rayons dorés et lumineux. Ça brille fort !","shop.core_default.name":"Plasma bleu","shop.core_default.desc":"Le cœur de plasma standard du CAM-R1.","shop.core_green.name":"Plasma vert","shop.core_green.desc":"Un mélange de plasma vert expérimental.","shop.core_solar.name":"Cœur solaire","shop.core_solar.desc":"Il brûle comme un petit soleil.","shop.core_void.name":"Cœur du néant","shop.core_void.desc":"Un cœur sombre au bord violet.","shop.up_shoes.name":"Baskets de course","shop.up_shoes.desc":"Déplace-toi entre les sections 30 % plus vite.","shop.up_coolant.name":"Refroidissement amélioré","shop.up_coolant.desc":"Le réacteur tourne environ 240 °C plus froid.","shop.up_shield.name":"Cloisons renforcées","shop.up_shield.desc":"+15 secondes pour fuir pendant un meltdown ou un freezedown.","ach.title":"Succès","ach.summary":"{n} sur {total} débloqués.","ach.unlocked":"Débloqué le {date}","ach.toast":"Succès débloqué","ach.startup.name":"Démarrage principal réussi","ach.startup.desc":"Lance le réacteur principal après avoir fait toutes les étapes de l'ordre de démarrage.","ach.meltdown.name":"Le Meltdown","ach.meltdown.desc":"Laisse le réacteur principal partir en meltdown.","ach.shutdown.name":"Arrêt d'urgence réussi","ach.shutdown.desc":"Termine un arrêt d'urgence et garde le réacteur en sécurité.","ach.surface.name":"Fuite par la surface","ach.surface.desc":"Survis à un meltdown, un freezedown ou l'ESDP en atteignant la Section Surface.","ach.bunkerB.name":"Fuite au Bunker Bêta","ach.bunkerB.desc":"Survis à un meltdown, un freezedown ou l'ESDP dans le Bunker d'urgence Bêta.","ach.bunkerA.name":"Fuite au Bunker Alpha","ach.bunkerA.desc":"Survis à un meltdown, un freezedown ou l'ESDP dans le Bunker d'urgence Alpha.","ach.freezedown.name":"Le Freezedown","ach.freezedown.desc":"Laisse le cœur geler sous −165 °C.","ach.burndown.name":"Le Burndown","ach.burndown.desc":"Laisse le cœur brûler au-delà de 6 000 °C.","ach.esdp.name":"L'ESDP","ach.esdp.desc":"Active le protocole d'autodestruction d'urgence (ESDP).","ach.heli.name":"Fuite en hélicoptère","ach.heli.desc":"Échappe à un burndown à bord de l'hélicoptère d'évacuation.","cred.title":"Crédits","cred.idea":"Idée et conception du jeu","cred.ideaV":"Directeur de l'installation C.A.M.","cred.prog":"Programmation","cred.progV":"Créé avec Claude","cred.fonts":"Polices","cred.sound":"Son","cred.soundV":"Généré en direct dans ton navigateur","cred.lang":"Langues","cred.langV":"Anglais, ukrainien, italien, anglais britannique, français","cred.thanks":"Remerciements spéciaux","cred.thanksV":"À chaque opérateur qui s'est mis en sécurité","exit.title":"Systèmes hors ligne","exit.text":"L'installation est fermée pour aujourd'hui. Tu peux fermer cet onglet.","exit.back":"Retour au menu","res.time":"Durée du service","res.earned":"Pièces gagnées","res.bonus":"Bonus d'évasion","res.new":"Nouveau service","res.menu":"Menu principal","res.flew":"Tu t'es envolé","res.bunker":"Tu as survécu dans le bunker","res.escaped":"Tu t'es échappé","res.heliText":"Tu es monté dans l'hélicoptère d'évacuation d'urgence C.A.M. avec {n} secondes d'avance. Les deux pilotes ont décollé pendant que le cœur brûlait l'installation en dessous.","res.bunkerText":"Tu as atteint {place} et fermé la porte avec {n} secondes d'avance. {blast}, mais le bunker a tenu. Les équipes de secours sont venues te sortir de là le lendemain matin.","res.surfText":"Tu as atteint la Section Surface avec {n} secondes d'avance. {blast}","res.fail.meltdown.t":"Installation perdue","res.fail.meltdown.d":"Le réacteur principal a explosé avant que tu sois en sécurité. La prochaine fois, cours vers la Section Surface ou un bunker d'urgence dès que les alarmes sonnent.","res.fail.freezedown.t":"Gelé sur place","res.fail.freezedown.d":"Le réacteur principal a éclaté dans une explosion glaciale avant que tu sois en sécurité. La prochaine fois, cours vers la Section Surface ou un bunker d'urgence dès que les alarmes de gel sonnent.","res.fail.esdp.t":"Autodétruit","res.fail.esdp.d":"Le cœur de l'ESDP a explosé avant que tu sois en sécurité. La prochaine fois, cours vers la Section Surface ou un bunker d'urgence juste après avoir activé l'ESDP.","res.fail.burndown.t":"Tout a brûlé","res.fail.burndown.d":"L'hélicoptère d'évacuation a quitté les héliports principaux sans toi, et le cœur a brûlé l'installation. La prochaine fois, file directement vers les héliports de la Section Surface.","blast.meltdown.far":"Le réacteur principal a explosé loin sous tes pieds.","blast.meltdown.bunk":"Toute l'installation a tremblé","blast.freezedown.far":"Le réacteur principal a éclaté dans une explosion glaciale loin sous tes pieds et a recouvert l'installation de glace.","blast.freezedown.bunk":"Une explosion glaciale a changé l'installation en glace","blast.esdp.far":"Le cœur de l'ESDP a explosé loin sous tes pieds et a emporté toute l'installation.","blast.esdp.bunk":"L'explosion du cœur de l'ESDP a ravagé toute l'installation","hud.loc":"Lieu","hud.reactor":"Réacteur","hud.temp":"Temp. du cœur","hud.stab":"Stabilité","hud.out":"Production","hud.menu":"Menu","hud.cont":"Confinement","st.offline":"HORS LIGNE","st.online":"EN LIGNE","st.warning":"ALERTE","st.shutdown":"ARRÊT D'URGENCE","cr.title":"Salle de contrôle principale · vue sur la chambre du réacteur","cr.order":"Ordre de démarrage","side.map":"Plan de l'installation","side.remote":"Réacteur (affichage à distance)","side.main":"Réacteur principal","side.cont":"Confinement","side.lasers":"Lasers","side.glass":"Portes en verre","side.cool":"Refroidissement","side.log":"Journal des événements","ro.overdrive":"TURBO","ro.extended":"DÉPLOYÉS","ro.retracted":"RENTRÉS","ro.moving":"EN MOUVEMENT","ro.closed":"FERMÉES","ro.open":"OUVERTES","sec.surface.name":"Section Surface","sec.surface.tag":"Niveau 0","sec.surface.desc":"Héliports principaux, poste de garde et sommet des cages d'ascenseur. Ciel ouvert et vent froid. En cas d'urgence, c'est ici qu'il faut être.","sec.A.name":"Secteur A","sec.A.tag":"Niveau −1","sec.A.desc":"Accueil et poste de contrôle de sécurité. Les ascenseurs descendent vers les niveaux de recherche.","sec.B.name":"Secteur B","sec.B.tag":"Niveau −2","sec.B.desc":"Laboratoires de calibrage des lasers. Des lentilles et des pièces d'émetteurs de rechange couvrent les murs.","sec.C.name":"Secteur C","sec.C.tag":"Niveau −2","sec.C.desc":"Logements et cafétéria de l'équipe de recherche.","sec.D.name":"Secteur D","sec.D.tag":"Niveau −3","sec.D.desc":"Station de pompage du refroidissement. D'énormes tuyaux bourdonnent d'eau glacée envoyée vers le réacteur.","sec.bunkerA.name":"Bunker d'urgence Alpha","sec.bunkerA.tag":"Secteur D · abri","sec.bunkerA.desc":"Un abri anti-explosion derrière une porte en acier d'un mètre d'épaisseur, avec des réserves d'air, de l'eau et des lits superposés. Pendant un meltdown, un freezedown ou l'ESDP, tu peux survivre ici.","sec.bunkerB.name":"Bunker d'urgence Bêta","sec.bunkerB.tag":"Secteur B · abri","sec.bunkerB.desc":"Un abri anti-explosion creusé dans la roche sous les labos laser. Murs épais, éclairage de secours et provisions pour une longue attente. Pendant un meltdown, un freezedown ou l'ESDP, tu peux survivre ici.","sec.zero.name":"Section Zéro","sec.zero.tag":"Niveau −4","sec.zero.desc":"L'ancienne chambre d'essai de première génération, scellée depuis les débuts de l'installation.","sec.epsilon.name":"Section Epsilon","sec.epsilon.tag":"Niveau −5","sec.epsilon.desc":"Centre de distribution d'énergie. De gros câbles transportent l'énergie du réacteur vers toute l'installation. Derrière une porte scellée se trouve la salle de contrôle de l'ESDP, le protocole d'autodestruction d'urgence.","sec.main.name":"Section principale","sec.main.tag":"Niveau −6","sec.main.desc":"Le domaine du réacteur principal. La Salle de contrôle principale donne sur la chambre du réacteur à travers les portes de protection en verre.","map.surface":"SURFACE","map.A":"SECTEUR A","map.B":"SECTEUR B","map.C":"SECTEUR C","map.D":"SECTEUR D","map.bunkerA":"BUNKER ALPHA","map.bunkerB":"BUNKER BÊTA","map.zero":"ZÉRO","map.epsilon":"EPSILON","map.main":"PRINCIPALE","travel.moving":"En route vers : {place}…","route.collapsed":"(effondré)","act.search":"Chercher des provisions","act.searched":"Fouillé · encore dans {n} s","act.end":"Finir le service et rentrer","act.esdpEnter":"Entrer dans la salle de contrôle de l'ESDP","act.esdpLeave":"Quitter la salle de contrôle de l'ESDP","act.padGo":"Aller aux héliports principaux","act.padGoing":"En route vers les héliports principaux…","act.board":"Monter dans l'hélicoptère d'évacuation","act.wait":"Tu attends l'hélicoptère aux héliports principaux…","esdp.title":"Salle de contrôle de l'ESDP · Section Epsilon","esdp.core":"Cœur de l'ESDP","esdp.text":"Le protocole d'autodestruction d'urgence a son propre cœur, séparé du réacteur principal. Une fois activé, le cœur de l'ESDP explose au bout de 2 minutes et détruit toute l'installation. Impossible de l'arrêter.","esdp.arm":"Armer l'ESDP","esdp.disarm":"Désarmer l'ESDP","esdp.armKey":"tourne la clé d'armement","esdp.armTurned":"clé d'armement tournée","esdp.locked":"verrouillé","esdp.activate":"Activer l'ESDP","esdp.armFirst":"arme-le d'abord","esdp.ready":"prêt","esdp.activated":"activé · impossible à arrêter","esdp.standby":"EN VEILLE","esdp.armed":"ARMÉ","esdp.detonating":"DÉTONATION","esdp.charge0":"Charge 0 %","esdp.charge":"Charge {p} % · explose dans {t}","p.contain.on":"Couper le champ de confinement","p.contain.off":"Démarrer le champ de confinement","p.ext.on":"Rentrer tous les lasers et fermer les portes laser","p.ext.off":"Déployer tous les lasers","p.ext.extended":"déployés","p.ext.retracted":"rentrés","p.ext.extending":"déploiement…","p.ext.retracting":"rentrée…","p.stab":"Lasers de stabilisation · gauche / droite","p.energy":"Lasers d'énergie · haut / bas","p.power":"Lasers de puissance · coins","p.glass.on":"Ouvrir les portes de protection en verre","p.glass.off":"Fermer les portes de protection en verre","p.glass.closed":"fermées","p.glass.open":"ouvertes","p.glass.closing":"fermeture…","p.glass.opening":"ouverture…","p.pumps":"Pompes de refroidissement","p.od":"Refroidissement turbo","p.odOn":"ON · refroidit vite","p.odNeeds":"il faut les pompes de refroidissement","p.main.on":"Arrêt principal","p.main.off":"Démarrage principal","p.emerg":"Arrêt d'urgence","p.emergProg":"en cours · {n} s","p.emergIdle":"arrête tout","p.doorsClosed":"portes laser fermées","ck.pumps":"Pompes de refroidissement en marche","ck.contain":"Champ de confinement en ligne","ck.ext":"Tous les lasers déployés","ck.stab":"Lasers de stabilisation allumés","ck.energy":"Lasers d'énergie allumés","ck.power":"Lasers de puissance allumés","ck.glass":"Portes de protection en verre fermées","ck.main":"Démarrage principal","ln.energy":"Lasers d'énergie","ln.stab":"Lasers de stabilisation","ln.power":"Lasers de puissance","log.start":"Le service commence. Tu es dans la Salle de contrôle principale.","log.collapsedWay":"Le passage vers {place} s'est effondré. Trouve un autre itinéraire.","log.bunkerBurn":"Les portes du bunker ne résisteront pas à un burndown ! Va aux héliports principaux de la Section Surface !","log.surfaceBurn":"Section Surface atteinte. Va aux héliports principaux !","log.found":"Pièces bleues trouvées ({place}) : +{n}.","log.esdpEnter":"Tu es entré dans la salle de contrôle de l'ESDP.","log.padRun":"Tu cours vers les héliports principaux…","log.board":"Tu es à bord. Les pilotes décollent !","log.esdpActiveKey":"L'ESDP est actif. La clé d'armement est bloquée.","log.esdpLocked":"L'ESDP est verrouillé pendant une urgence. Évacue !","log.esdpArmed":"ESDP armé. Appuie sur Activer l'ESDP pour lancer l'autodestruction.","log.esdpDisarmed":"ESDP désarmé.","log.esdpAlready":"L'ESDP est déjà actif. Évacue !","log.esdpArmFirst":"Arme d'abord l'ESDP.","log.shutFail":"L'arrêt d'urgence a échoué. Impossible d'arrêter : {ev}. Évacue !","log.noControl":"Les commandes ne répondent plus. Évacue !","log.shutLocked":"Arrêt d'urgence en cours. Les commandes sont bloquées.","log.contOn":"Démarrage du champ de confinement.","log.contOffRun":"Champ de confinement coupé pendant que le réacteur tourne !","log.contOff":"Champ de confinement coupé.","log.mainNoCont":"Démarrage principal sans champ de confinement ! Le cœur est instable !","log.mainGlass":"Démarrage principal avec les portes de protection en verre ouvertes.","log.mainOk":"Démarrage principal. Le réacteur se met en ligne.","log.mainDown":"Le réacteur principal s'arrête.","log.glassClose":"Fermeture des portes de protection en verre.","log.glassOpen":"Ouverture des portes de protection en verre.","log.extOff":"Tous les lasers éteints. Les lasers rentrent et les portes laser se ferment.","log.extOn":"Les portes laser s'ouvrent et tous les lasers se déploient.","log.laserDoors":"{laser} : les portes laser sont fermées. Déploie d'abord tous les lasers.","log.powerNoStab":"Lasers de puissance allumés sans lasers de stabilisation ! La stabilité baisse !","log.laserOn":"{laser} : allumés.","log.laserOff":"{laser} : éteints.","log.pumpsStopRun":"Pompes de refroidissement arrêtées pendant que le réacteur tourne ! Le cœur va surchauffer !","log.pumpsStop":"Pompes de refroidissement arrêtées.","log.pumpsOn":"Pompes de refroidissement en marche.","log.odNeeds":"Le refroidissement turbo a besoin des pompes de refroidissement en marche.","log.odOn":"Refroidissement turbo allumé. Le cœur refroidit vite — ne le laisse pas geler.","log.odOff":"Refroidissement turbo éteint.","log.emerg":"ARRÊT D'URGENCE. Tous les lasers s'éteignent, le réacteur s'arrête, les portes en verre se ferment.","log.event":"{ev} : {reason}","why.meltdown":"le cœur a perdu toute stabilité.","why.burndown":"le cœur a dépassé 6 000 °C.","why.freezedown":"le cœur est descendu sous −165 °C.","why.esdp":"le protocole d'autodestruction d'urgence a été activé. Le cœur de l'ESDP explose dans 2 minutes.","log.debris":"Des débris bloquent le passage : {place}. Trouve un autre chemin !","log.heliComing":"Un hélicoptère d'évacuation d'urgence C.A.M. arrive vers les héliports principaux. Il se pose dans 30 secondes.","log.heliLanded":"L'hélicoptère d'évacuation s'est posé sur les héliports principaux. Deux pilotes t'attendent. Il repart dans 30 secondes !","log.atPad":"Tu es aux héliports principaux.","log.heliGone":"L'hélicoptère d'évacuation est parti sans toi.","log.surge":"Surtension de plasma détectée dans le cœur.","log.hot":"Le cœur surchauffe ! Rallume les pompes de refroidissement !","log.cold":"Le cœur gèle ! Éteins le refroidissement turbo !","log.shutDone":"Arrêt d'urgence terminé. Le réacteur est en sécurité.","ev.burnComing":"Va aux héliports principaux de la Section Surface ! L'hélicoptère d'évacuation se pose dans {n} s. Les bunkers ne survivront pas à un burndown. Effondrement : {place}.","ev.burnLanded":"L'hélicoptère d'évacuation est sur les héliports principaux ! Il repart dans {n} s — monte à bord tout de suite.","ev.esdp":"Le cœur de l'ESDP explose dans {t}. Va à la Section Surface ou dans un bunker d'urgence !","ev.freezePre":"Le cœur est en train de geler complètement. ","ev.escape":"Va à la Section Surface ou dans un bunker d'urgence ! Effondrement : {place}. Accès coupé : {bunker}. Prends un autre chemin.","cnt.lands":"se pose dans {n} s","cnt.leaves":"repart dans {n} s","crew.chief.role":"Dirige l'équipe de secours. Solide pour chaque tâche.","crew.digger.role":"Spécialiste du déblaiement. Creuse vite, mais est lent avec les portes lourdes.","crew.eng.role":"Ingénieur des portes blindées. Ouvre les portes vite, creuse un peu plus lentement.","crew.dig":"Creuser","crew.doors":"Portes","af.skip":"Passer l'épilogue","af.title.heli":"Les héliports principaux","af.title.road":"La route principale","af.title.rescue":"Sauvetage : {place}","af.eb.heli":"Épilogue · Évacuation du burndown","af.eb.surf":"Épilogue · {ev} · fuite par la surface","af.eb.bunk":"Épilogue · {ev} · Corps de sauvetage d'urgence C.A.M.","af.h.walkHeli":"Le cœur brûle l'installation. Maintiens Marcher (ou la touche →) pour courir vers l'hélicoptère d'évacuation.","af.h.walk":"Le réacteur n'existe plus. Maintiens Marcher (ou la touche →) pour suivre la route principale jusqu'aux grilles principales.","af.h.liftoff":"Tu es à bord. Les deux pilotes décollent des héliports principaux…","af.h.pick":"Le Corps de sauvetage d'urgence C.A.M. est arrivé. Objectif : {place}. Choisis le sauveteur que tu veux incarner.","af.h.dig":"Touche Creuser (ou appuie sur Espace) pour dégager les gravats jusqu'aux portes du bunker.","af.h.walkdoor":"Les portes du bunker sont dégagées. Direction le volant de la porte…","af.h.door":"Maintiens Ouvrir les portes (ou Espace) pour tourner le volant de la porte.","af.h.opening":"La porte blindée s'ouvre…","af.h.rescue":"L'opérateur est vivant !","af.b.walk":"Marcher ▶","af.b.dig":"Creuser","af.b.open":"Ouvrir les portes","af.found":"Opérateur retrouvé vivant !","af.rubble":"GRAVATS DÉGAGÉS","af.wheel":"VOLANT DE PORTE","af.f.gates":"Tu es sorti par les grilles principales.","af.f.frozen":"L'installation C.A.M. est complètement gelée, mais tu t'en es sorti.","af.f.gone":"L'installation C.A.M. n'existe plus, mais tu t'en es sorti.","af.f.rescue":"Sauvetage terminé.","af.f.rescueSub":"La personne rescapée ({place}) est en sécurité avec l'équipe de secours.","af.f.heli":"L'hélicoptère t'a emporté loin d'ici.","af.f.heliSub":"Sous toi, le cœur a brûlé l'installation C.A.M."}};
+const LANGS=[
+ {id:'en',name:'English',sub:'United States',loc:'en-US'},
+ {id:'uk',name:'Українська',sub:'Ukrainian',loc:'uk-UA'},
+ {id:'it',name:'Italiano',sub:'Italian',loc:'it-IT'},
+ {id:'gb',name:'English',sub:'United Kingdom',loc:'en-GB'},
+ {id:'fr',name:'Français',sub:'French',loc:'fr-FR'},
+];
+(()=>{ // British English = American English with British spelling and words
+  const swaps=[[/Stabiliz/g,'Stabilis'],[/stabiliz/g,'stabilis'],[/olor/g,'olour'],[/meter-thick/g,'metre-thick'],[/Elevators/g,'Lifts'],[/elevator/g,'lift'],[/cafeteria/g,'canteen']];
+  const gb={}; for(const [k,v] of Object.entries(I18N.en||{})) gb[k]=swaps.reduce((s,[a,b])=>s.replace(a,b),v);
+  I18N.gb=gb;
+})();
+let lang=(save.settings.lang&&LANGS.some(l=>l.id===save.settings.lang))?save.settings.lang:'en';
+const locale=()=>LANGS.find(l=>l.id===lang).loc;
+function t(k,v){
+  let s=(I18N[lang]&&I18N[lang][k])??(I18N.en&&I18N.en[k])??k;
+  if(v) s=s.replace(/\{(\w+)\}/g,(m,n)=>v[n]!==undefined?v[n]:m);
+  return s;
+}
+const num=n=>Number(n).toLocaleString(locale());
+const secName=k=>t('sec.'+k+'.name');
+window.__tr=t;
+function applyI18n(){
+  document.documentElement.lang=lang==='gb'?'en-GB':lang==='en'?'en-US':lang;
+  $$('[data-i18n]').forEach(el=>{ el.textContent=t(el.dataset.i18n); });
+  const L=LANGS.find(l=>l.id===lang); $('#langNow').textContent=L.id==='gb'||L.id==='en'?`${L.name} (${L.id==='gb'?'UK':'US'})`:L.name;
+  $('#playHint').textContent=(S&&!S.ended)?t('menu.resume'):t('menu.start');
+  renderTutorial();
+  if(S){ renderSection(); buildMap(); if(S.melt) eventText(); }
+  updateCoins();
+}
+function renderLangs(){
+  $('#langList').innerHTML=LANGS.map(l=>`<button class="lang ${l.id===lang?'on':''}" data-lang="${l.id}"><span>${l.name}${l.id==='en'?' (US)':l.id==='gb'?' (UK)':''}</span><small>${l.sub}</small></button>`).join('');
+}
+$('#langList').addEventListener('click',e=>{const b=e.target.closest('[data-lang]'); if(!b) return;
+  lang=b.dataset.lang; save.settings.lang=lang; persist(); applyI18n(); renderLangs();});
+const TUT=['startup','control','log','events','escape','esdp'];
+function renderTutorial(){
+  $('#tutNav').innerHTML=TUT.map(k=>`<a href="#tut-${k}" data-tut="${k}">${t('tut.'+k+'.h')}</a>`).join('');
+  $('#tutList').innerHTML=TUT.map(k=>`<article class="tut" id="tut-${k}"><h3>${t('tut.'+k+'.h')}</h3>${t('tut.'+k+'.b')}</article>`).join('');
+}
+$('#tutNav').addEventListener('click',e=>{const a=e.target.closest('[data-tut]'); if(!a) return; e.preventDefault(); const el=$('#tut-'+a.dataset.tut); if(el) el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});});
+
+
 const SHOP=[
- {id:'laser_default',cat:'Laser colors',slot:'laser',name:'Standard Issue',price:0,desc:'Cyan energy, green stabilization, amber power lasers.',colors:{energy:'#4fd8ff',stab:'#6dffb0',power:'#ffb547'}},
- {id:'laser_crimson',cat:'Laser colors',slot:'laser',name:'Crimson Set',price:60,desc:'Hot red beams for every laser group.',colors:{energy:'#ff4f6a',stab:'#ff9a5c',power:'#ff2e2e'}},
- {id:'laser_violet',cat:'Laser colors',slot:'laser',name:'Violet Set',price:80,desc:'Purple and indigo beams.',colors:{energy:'#b07bff',stab:'#e98bff',power:'#7b8bff'}},
- {id:'laser_gold',cat:'Laser colors',slot:'laser',name:'Gold Set',price:120,desc:'Bright gold beams. Very shiny.',colors:{energy:'#ffe27a',stab:'#fff3c4',power:'#ffb000'}},
- {id:'core_default',cat:'Reactor core',slot:'core',name:'Blue Plasma',price:0,desc:'The standard CAM-R1 plasma core.',core:{a:'#e4f6ff',b:'#3d8bff'}},
- {id:'core_green',cat:'Reactor core',slot:'core',name:'Green Plasma',price:90,desc:'An experimental green plasma mix.',core:{a:'#e2ffe5',b:'#2fd36b'}},
- {id:'core_solar',cat:'Reactor core',slot:'core',name:'Solar Core',price:150,desc:'Burns like a tiny sun.',core:{a:'#fff6d8',b:'#ff8a1f'}},
- {id:'core_void',cat:'Reactor core',slot:'core',name:'Void Core',price:250,desc:'A dark core with a purple edge.',core:{a:'#1a0b33',b:'#9b5cff'}},
- {id:'up_shoes',cat:'Upgrades',slot:null,name:'Running Shoes',price:120,desc:'Move between sections 30% faster.'},
- {id:'up_coolant',cat:'Upgrades',slot:null,name:'Coolant Upgrade',price:150,desc:'The reactor runs about 240 °C cooler.'},
- {id:'up_shield',cat:'Upgrades',slot:null,name:'Reinforced Bulkheads',price:140,desc:'+15 seconds to escape during a meltdown or freezedown.'},
+ {id:'laser_default',cat:'laser',slot:'laser',name:'Standard Issue',price:0,desc:'Cyan energy, green stabilization, amber power lasers.',colors:{energy:'#4fd8ff',stab:'#6dffb0',power:'#ffb547'}},
+ {id:'laser_crimson',cat:'laser',slot:'laser',name:'Crimson Set',price:60,desc:'Hot red beams for every laser group.',colors:{energy:'#ff4f6a',stab:'#ff9a5c',power:'#ff2e2e'}},
+ {id:'laser_violet',cat:'laser',slot:'laser',name:'Violet Set',price:80,desc:'Purple and indigo beams.',colors:{energy:'#b07bff',stab:'#e98bff',power:'#7b8bff'}},
+ {id:'laser_gold',cat:'laser',slot:'laser',name:'Gold Set',price:120,desc:'Bright gold beams. Very shiny.',colors:{energy:'#ffe27a',stab:'#fff3c4',power:'#ffb000'}},
+ {id:'core_default',cat:'core',slot:'core',name:'Blue Plasma',price:0,desc:'The standard CAM-R1 plasma core.',core:{a:'#e4f6ff',b:'#3d8bff'}},
+ {id:'core_green',cat:'core',slot:'core',name:'Green Plasma',price:90,desc:'An experimental green plasma mix.',core:{a:'#e2ffe5',b:'#2fd36b'}},
+ {id:'core_solar',cat:'core',slot:'core',name:'Solar Core',price:150,desc:'Burns like a tiny sun.',core:{a:'#fff6d8',b:'#ff8a1f'}},
+ {id:'core_void',cat:'core',slot:'core',name:'Void Core',price:250,desc:'A dark core with a purple edge.',core:{a:'#1a0b33',b:'#9b5cff'}},
+ {id:'up_shoes',cat:'up',slot:null,name:'Running Shoes',price:120,desc:'Move between sections 30% faster.'},
+ {id:'up_coolant',cat:'up',slot:null,name:'Coolant Upgrade',price:150,desc:'The reactor runs about 240 °C cooler.'},
+ {id:'up_shield',cat:'up',slot:null,name:'Reinforced Bulkheads',price:140,desc:'+15 seconds to escape during a meltdown or freezedown.'},
 ];
 const item=id=>SHOP.find(s=>s.id===id);
 const laserColors=()=>(item(save.equip.laser)||SHOP[0]).colors;
@@ -458,7 +543,7 @@ const ACH=[
  {id:'bunkerA',icon:'α',name:'Bunker Alpha Escape',desc:'Survive a meltdown, freezedown or ESDP inside Emergency Bunker Alpha.'},
  {id:'freezedown',icon:'❄',name:'The Freezedown',desc:'Let the core freeze below −165 °C.'},
  {id:'burndown',icon:'✹',name:'The Burndown',desc:'Let the core burn past 6,000 °C.'},
- {id:'esdp',icon:'Ω',name:'Self-Destruct',desc:'Activate the emergency self-destruction protocol (ESDP).'},
+ {id:'esdp',icon:'Ω',name:'The ESDP',desc:'Activate the emergency self-destruction protocol (ESDP).'},
  {id:'heli',icon:'H',name:'Helicopter Escape',desc:'Escape a burndown on the evacuation helicopter.'},
 ];
 let toastTimer=0;
@@ -466,15 +551,16 @@ function unlock(id){
   if(save.ach[id]) return;
   const a=ACH.find(x=>x.id===id); if(!a) return;
   save.ach[id]=Date.now(); persist(); updateCoins();
-  $('#toastIcon').textContent=a.icon; $('#toastName').textContent=a.name; $('#toast').hidden=false;
+  $('#toastIcon').textContent=a.icon; $('#toastName').textContent=t('ach.'+a.id+'.name'); $('#toast').hidden=false;
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').hidden=true,3500);
   beep(784,.12,'triangle',.14); beep(1047,.12,'triangle',.14,.12); beep(1319,.25,'triangle',.14,.24);
 }
 function renderAch(){
+  const tr=window.__tr;
   const n=ACH.filter(a=>save.ach[a.id]).length;
-  $('#achSummary').textContent=`${n} of ${ACH.length} unlocked.`;
+  $('#achSummary').textContent=t('ach.summary',{n,total:ACH.length});
   $('#achList').innerHTML=ACH.map(a=>{const t=save.ach[a.id];
-    return `<div class="ach ${t?'got':''}"><span class="ach-icon">${t?a.icon:'?'}</span><div><h4>${a.name}</h4><p>${a.desc}</p>${t?`<div class="when">Unlocked ${new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>`:''}</div></div>`;}).join('');
+    return `<div class="ach ${t?'got':''}"><span class="ach-icon">${t?a.icon:'?'}</span><div><h4>${tr('ach.'+a.id+'.name')}</h4><p>${tr('ach.'+a.id+'.desc')}</p>${t?`<div class="when">${tr('ach.unlocked',{date:new Date(t).toLocaleDateString(locale(),{day:'numeric',month:'short',year:'numeric'})})}</div>`:''}</div></div>`;}).join('');
 }
 
 /* ---------------- facility ---------------- */
@@ -498,7 +584,7 @@ function newShift(){
      surgeIn:30+Math.random()*25,search:{},warnBeep:0,alarm:0,logs:[],
      r:{contain:false,main:false,glass:false,ext:false,energy:false,stab:false,power:false,
         pumps:true,od:false,contA:0,extA:0,glassA:0,temp:20,stability:100,out:0}};
-  log('Shift started. You are in the Main Control Room.','info');
+  log(t('log.start'),'info');
   renderSection(); buildMap();
 }
 
@@ -535,7 +621,9 @@ function show(id){
   if(id==='shop') renderShop();
   if(id==='settings') renderSettings();
   if(id==='achievements') renderAch();
-  if(id==='menu') $('#playHint').textContent=(S&&!S.ended)?'resume shift':'start shift';
+  if(id==='language') renderLangs();
+  if(id==='tutorial') renderTutorial();
+  if(id==='menu') $('#playHint').textContent=(S&&!S.ended)?t('menu.resume'):t('menu.start');
   if(id!=='game' && humGain) humGain.gain.value=0;
   updateCoins(); window.scrollTo(0,0);
 }
@@ -545,14 +633,14 @@ document.addEventListener('click',e=>{
   if(g==='exit'){ show('exit'); try{window.close()}catch(_){} return; }
   show(g);
 });
-function updateCoins(){ $$('.coinTxt').forEach(el=>el.textContent=save.coins.toLocaleString('en-US'));
+function updateCoins(){ $$('.coinTxt').forEach(el=>el.textContent=num(save.coins));
   $('#achCount').textContent=`${ACH.filter(a=>save.ach[a.id]).length} / ${ACH.length}`; }
 
 /* ---------------- settings ---------------- */
-function setToggle(el,v){el.setAttribute('aria-pressed',v);el.textContent=v?'ON':'OFF';}
+function setToggle(el,v){el.setAttribute('aria-pressed',v);el.textContent=v?t('common.on'):t('common.off');}
 function renderSettings(){
   setToggle($('#setSound'),save.settings.sound); setToggle($('#setShake'),save.settings.shake); setToggle($('#setCheck'),save.settings.checklist);
-  $('#setVol').value=save.settings.vol; const r=$('#setReset'); r.classList.remove('armed'); r.textContent='Reset';
+  $('#setVol').value=save.settings.vol; const r=$('#setReset'); r.classList.remove('armed'); r.textContent=t('set.resetBtn');
 }
 $('#setSound').onclick=()=>{save.settings.sound=!save.settings.sound;applyVol();persist();renderSettings();};
 $('#setShake').onclick=()=>{save.settings.shake=!save.settings.shake;persist();renderSettings();};
@@ -560,25 +648,25 @@ $('#setCheck').onclick=()=>{save.settings.checklist=!save.settings.checklist;per
 $('#setVol').oninput=e=>{save.settings.vol=+e.target.value;applyVol();persist();};
 $('#setReset').onclick=e=>{
   const b=e.currentTarget;
-  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Tap again to confirm';return;}
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent=t('set.resetConfirm');return;}
   const keep=save.settings; save=DEFAULT_SAVE(); save.settings=keep; persist(); S=null; updateCoins();
-  b.classList.remove('armed'); b.textContent='Progress reset';
+  b.classList.remove('armed'); b.textContent=t('set.resetDone');
 };
 
 /* ---------------- shop ---------------- */
 function renderShop(){
   const cats=[...new Set(SHOP.map(s=>s.cat))];
-  $('#shopList').innerHTML=cats.map(c=>`<div class="shop-cat"><h3>${c}</h3><div class="shop-grid">${
+  $('#shopList').innerHTML=cats.map(c=>`<div class="shop-cat"><h3>${t('shop.cat.'+c)}</h3><div class="shop-grid">${
     SHOP.filter(s=>s.cat===c).map(s=>{
       const own=has(s.id), eq=s.slot&&save.equip[s.slot]===s.id;
       let sw='';
       if(s.colors) sw=`<div class="swatches">${Object.values(s.colors).map(c=>`<span style="background:${c}"></span>`).join('')}</div>`;
       if(s.core) sw=`<div class="swatches"><span style="background:radial-gradient(circle,${s.core.a},${s.core.b})"></span></div>`;
       let btn;
-      if(!own) btn=`<button class="buy" data-buy="${s.id}" ${save.coins<s.price?'disabled':''}>Buy · ${s.price} coins</button>`;
-      else if(s.slot) btn=`<button data-equip="${s.id}" ${eq?'disabled':''}>${eq?'Equipped':'Equip'}</button>`;
-      else btn=`<button disabled>Owned</button>`;
-      return `<div class="item ${eq?'equipped':''}">${sw}<h4>${s.name}</h4><p>${s.desc}</p>${btn}</div>`;
+      if(!own) btn=`<button class="buy" data-buy="${s.id}" ${save.coins<s.price?'disabled':''}>${t('shop.buy',{n:s.price})}</button>`;
+      else if(s.slot) btn=`<button data-equip="${s.id}" ${eq?'disabled':''}>${eq?t('shop.equipped'):t('shop.equip')}</button>`;
+      else btn=`<button disabled>${t('shop.owned')}</button>`;
+      return `<div class="item ${eq?'equipped':''}">${sw}<h4>${t('shop.'+s.id+'.name')}</h4><p>${t('shop.'+s.id+'.desc')}</p>${btn}</div>`;
     }).join('')}</div></div>`).join('');
 }
 $('#shopList').addEventListener('click',e=>{
@@ -607,7 +695,7 @@ function buildMap(){
     const o=SECTIONS[l]; h+=`<line class="edge" data-e="${key}" x1="${s.x}" y1="${s.y}" x2="${o.x}" y2="${o.y}"/>`;
   }
   for(const [k,s] of Object.entries(SECTIONS)){
-    const label=k==='surface'?'SURFACE':k==='zero'?'ZERO':k==='epsilon'?'EPSILON':k==='main'?'MAIN':k==='bunkerA'?'BUNKER ALPHA':k==='bunkerB'?'BUNKER BETA':'SECTOR '+k;
+    const label=t('map.'+k);
     h+=`<g class="node" data-n="${k}"><rect x="${s.x-42}" y="${s.y-12}" width="84" height="24" rx="3"/><text x="${s.x}" y="${s.y+1}">${label}</text></g>`;
   }
   h+=`<circle class="you" id="youDot" r="5" cx="0" cy="0"/>`;
@@ -636,7 +724,7 @@ function go(to){
   if(!S||S.ended||S.travel) return;
   if(to===S.loc) return;
   if(!SECTIONS[S.loc].links.includes(to)) return;
-  if(S.blocked===to){log(`The way into ${SECTIONS[to].name} has collapsed. Find another route.`,'err');return;}
+  if(S.blocked===to){log(t('log.collapsedWay',{place:secName(to)}),'err');return;}
   if(S.loc==='surface'){ S.pad=false; S.padGo=0; }
   const dur=(S.melt?4:2.5)*(has('up_shoes')?.7:1);
   S.travel={to,t:0,dur}; beep(440,.06,'triangle',.08);
@@ -647,8 +735,8 @@ function arrive(){
   renderSection();
   if(S.melt && isSafe(S.loc)){
     if(S.melt.type!=='burndown') endShift(true);
-    else if(SECTIONS[S.loc].bunker) log('The bunker doors will not hold against a burndown! Get to the main helipads in the Surface Section!','err');
-    else log('Surface Section reached. Get to the main helipads!','warn');
+    else if(SECTIONS[S.loc].bunker) log(t('log.bunkerBurn'),'err');
+    else log(t('log.surfaceBurn'),'warn');
   }
 }
 
@@ -656,25 +744,25 @@ function arrive(){
 function renderSection(){
   if(!S) return;
   const s=SECTIONS[S.loc];
-  $('#secName').textContent=s.name; $('#secTag').textContent=s.tag; $('#secDesc').textContent=s.desc;
-  $('#hLoc').textContent=S.travel?`→ ${SECTIONS[S.travel.to].name}`:s.name;
+  $('#secName').textContent=secName(S.loc); $('#secTag').textContent=t('sec.'+S.loc+'.tag'); $('#secDesc').textContent=t('sec.'+S.loc+'.desc');
+  $('#hLoc').textContent=S.travel?`→ ${secName(S.travel.to)}`:secName(S.loc);
   $('#travelBox').hidden=!S.travel;
-  if(S.travel) $('#travelTxt').textContent=`Moving to ${SECTIONS[S.travel.to].name}…`;
+  if(S.travel) $('#travelTxt').textContent=t('travel.moving',{place:secName(S.travel.to)});
   const order=['surface','A','B','C','D','zero','epsilon','main'];
   const rank=k=>SECTIONS[k].bunker?-1:order.indexOf(k);
   $('#routes').innerHTML=S.travel?'':s.links.slice().sort((a,b)=>rank(a)-rank(b)).map(l=>{
     const col=S.blocked===l, bunk=!!SECTIONS[l].bunker, up=!bunk&&order.indexOf(l)<order.indexOf(S.loc);
     const icon=col?'✕ ':bunk?'▣ ':up?'↑ ':'↓ ';
-    return `<button class="route ${col?'collapsed':''} ${S.melt&&(up||(bunk&&S.melt.type!=='burndown'))?'up':''}" data-to="${l}">${icon}${SECTIONS[l].name}${col?' (collapsed)':''}</button>`;}).join('');
+    return `<button class="route ${col?'collapsed':''} ${S.melt&&(up||(bunk&&S.melt.type!=='burndown'))?'up':''}" data-to="${l}">${icon}${secName(l)}${col?' '+t('route.collapsed'):''}</button>`;}).join('');
   let acts='';
-  if(!S.travel && S.loc!=='main' && S.loc!=='surface' && !S.melt) acts+=`<button class="act" id="searchBtn">Search for supplies</button>`;
-  if(!S.travel && S.loc==='surface' && !S.melt) acts+=`<button class="act" id="endBtn">End shift and go home</button>`;
-  if(!S.travel && S.loc==='epsilon') acts+=`<button class="act" id="esdpRoomBtn" style="border-color:#9b5cff88">${S.esdpRoom?'Leave the ESDP main control room':'Enter the ESDP main control room'}</button>`;
+  if(!S.travel && S.loc!=='main' && S.loc!=='surface' && !S.melt) acts+=`<button class="act" id="searchBtn">${t('act.search')}</button>`;
+  if(!S.travel && S.loc==='surface' && !S.melt) acts+=`<button class="act" id="endBtn">${t('act.end')}</button>`;
+  if(!S.travel && S.loc==='epsilon') acts+=`<button class="act" id="esdpRoomBtn" style="border-color:#9b5cff88">${S.esdpRoom?t('act.esdpLeave'):t('act.esdpEnter')}</button>`;
   if(S.loc!=='epsilon'||S.travel) S.esdpRoom=false;
   $('#esdpRoom').hidden=!S.esdpRoom; esdpUI();
   if(!S.travel && S.loc==='surface' && S.melt && S.melt.type==='burndown'){
-    if(!S.pad) acts+=S.padGo>0?`<button class="act" disabled>Heading to the main helipads…</button>`:`<button class="act" id="padBtn">Go to the main helipads</button>`;
-    else acts+=heliState()==='landed'?`<button class="act" id="boardBtn" style="border-color:var(--green);color:var(--green)">Board the evacuation helicopter</button>`:`<button class="act" disabled>Waiting at the main helipads for the helicopter…</button>`;
+    if(!S.pad) acts+=S.padGo>0?`<button class="act" disabled>${t('act.padGoing')}</button>`:`<button class="act" id="padBtn">${t('act.padGo')}</button>`;
+    else acts+=heliState()==='landed'?`<button class="act" id="boardBtn" style="border-color:var(--green);color:var(--green)">${t('act.board')}</button>`:`<button class="act" disabled>${t('act.wait')}</button>`;
   }
   $('#secActions').innerHTML=acts;
   $('#controlRoom').hidden=!(S.loc==='main'&&!S.travel);
@@ -686,17 +774,17 @@ $('#secActions').addEventListener('click',e=>{
   if(e.target.id==='searchBtn'){
     const cd=S.search[S.loc]||0; if(S.time<cd) return;
     const n=1+Math.floor(Math.random()*4); save.coins+=n; S.earned+=n; persist(); updateCoins();
-    S.search[S.loc]=S.time+45; log(`Found ${n} blue coin${n>1?'s':''} in ${SECTIONS[S.loc].name}.`,'good'); beep(880,.08,'triangle',.12); updateSearchBtn();
+    S.search[S.loc]=S.time+45; log(t('log.found',{n,place:secName(S.loc)}),'good'); beep(880,.08,'triangle',.12); updateSearchBtn();
   }
-  if(e.target.id==='esdpRoomBtn'){ S.esdpRoom=!S.esdpRoom; beep(300,.2,'triangle',.1); if(S.esdpRoom) log('You entered the ESDP main control room.','info'); renderSection(); }
-  if(e.target.id==='padBtn'&&!S.padGo&&!S.pad){ S.padGo=2; log('Running to the main helipads…','info'); renderSection(); }
-  if(e.target.id==='boardBtn'&&S.pad&&heliState()==='landed'){ log('You climbed aboard. The pilots are lifting off!','good'); endShift(true); }
+  if(e.target.id==='esdpRoomBtn'){ S.esdpRoom=!S.esdpRoom; beep(300,.2,'triangle',.1); if(S.esdpRoom) log(t('log.esdpEnter'),'info'); renderSection(); }
+  if(e.target.id==='padBtn'&&!S.padGo&&!S.pad){ S.padGo=2; log(t('log.padRun'),'info'); renderSection(); }
+  if(e.target.id==='boardBtn'&&S.pad&&heliState()==='landed'){ log(t('log.board'),'good'); endShift(true); }
   if(e.target.id==='endBtn'){ S.ended=true; persist(); show('menu'); }
 });
 function updateSearchBtn(){
   const b=$('#searchBtn'); if(!b) return;
   const left=Math.ceil((S.search[S.loc]||0)-S.time);
-  b.disabled=left>0; b.textContent=left>0?`Searched · again in ${left}s`:'Search for supplies';
+  b.disabled=left>0; b.textContent=left>0?t('act.searched',{n:left}):t('act.search');
 }
 
 /* ---------------- ESDP ---------------- */
@@ -704,40 +792,40 @@ function esdpUI(){
   if(!S||$('#esdpRoom').hidden) return;
   const live=S.melt&&S.melt.type==='esdp';
   $('#esdpOrb').className='orb'+(live?' live':S.esdpArmed?' armed':'');
-  $('#esdpState').textContent=live?'DETONATING':S.esdpArmed?'ARMED':'STANDBY';
-  $('#esdpCharge').textContent=live?`Charge ${Math.round((1-S.melt.t/S.melt.total)*100)}% · explodes in ${fmtT(Math.ceil(S.melt.t))}`:'Charge 0%';
+  $('#esdpState').textContent=live?t('esdp.detonating'):S.esdpArmed?t('esdp.armed'):t('esdp.standby');
+  $('#esdpCharge').textContent=live?t('esdp.charge',{p:Math.round((1-S.melt.t/S.melt.total)*100),t:fmtT(Math.ceil(S.melt.t))}):t('esdp.charge0');
   const arm=$('#esdpArm'), go=$('#esdpGo');
   arm.classList.toggle('lit',!!S.esdpArmed||live); arm.style.setProperty('--lampc','#9b5cff');
-  arm.querySelector('.pl').textContent=S.esdpArmed||live?'Disarm ESDP':'Arm ESDP';
-  arm.querySelector('.ps').textContent=live?'locked':S.esdpArmed?'arming key turned':'turn the arming key';
+  arm.querySelector('.pl').textContent=S.esdpArmed||live?t('esdp.disarm'):t('esdp.arm');
+  arm.querySelector('.ps').textContent=live?t('esdp.locked'):S.esdpArmed?t('esdp.armTurned'):t('esdp.armKey');
   go.classList.toggle('lit',live);
-  go.querySelector('.ps').textContent=live?'activated · cannot be stopped':S.esdpArmed?'ready':'arm it first';
+  go.querySelector('.ps').textContent=live?t('esdp.activated'):S.esdpArmed?t('esdp.ready'):t('esdp.armFirst');
   go.classList.toggle('blocked',!S.esdpArmed&&!live);
 }
 $('#esdpArm').onclick=()=>{
-  if(S.melt){ log(S.melt.type==='esdp'?'The ESDP is active. The arming key is locked.':'The ESDP is locked during an emergency. Evacuate!','err'); return; }
-  S.esdpArmed=!S.esdpArmed; log(S.esdpArmed?'ESDP armed. Press Activate ESDP to start the self-destruct.':'ESDP disarmed.',S.esdpArmed?'warn':'info');
+  if(S.melt){ log(S.melt.type==='esdp'?t('log.esdpActiveKey'):t('log.esdpLocked'),'err'); return; }
+  S.esdpArmed=!S.esdpArmed; log(S.esdpArmed?t('log.esdpArmed'):t('log.esdpDisarmed'),S.esdpArmed?'warn':'info');
   beep(S.esdpArmed?520:260,.25,'square',.1); esdpUI();
 };
 $('#esdpGo').onclick=()=>{
-  if(S.melt){ log(S.melt.type==='esdp'?'The ESDP is already active. Evacuate!':'The ESDP is locked during an emergency. Evacuate!','err'); return; }
-  if(!S.esdpArmed){ log('Arm the ESDP first.','err'); return; }
-  startEvent('esdp','the emergency self-destruction protocol was activated. The ESDP core explodes in 2 minutes.');
+  if(S.melt){ log(S.melt.type==='esdp'?t('log.esdpAlready'):t('log.esdpLocked'),'err'); return; }
+  if(!S.esdpArmed){ log(t('log.esdpArmFirst'),'err'); return; }
+  startEvent('esdp',t('why.esdp'));
   beep(200,.8,'sawtooth',.15); esdpUI();
 };
 
 /* ---------------- control panel ---------------- */
 const BTNS=[
- {id:'contain',label:r=>r.contain?'Disengage containment field':'Startup containment field',on:r=>r.contain,c:'#4fd8ff'},
- {id:'ext',label:r=>r.ext?'Retract all lasers & close laser doors':'Extend all lasers',on:r=>r.ext,c:'#ffb547',sub:r=>r.extA>=1?(r.ext?'extended':'retracted'):(r.ext?'extending…':r.extA>0?'retracting…':'retracted')},
- {id:'stab',label:()=>'Stabilization lasers · left / right',on:r=>r.stab,c:()=>laserColors().stab,laser:true},
- {id:'energy',label:()=>'Energy lasers · upper / lower',on:r=>r.energy,c:()=>laserColors().energy,laser:true},
- {id:'power',label:()=>'Power lasers · corners',on:r=>r.power,c:()=>laserColors().power,laser:true},
- {id:'glass',label:r=>r.glass?'Open glass protection doors':'Close glass protection doors',on:r=>r.glass,c:'#9fd3ff',sub:r=>r.glassA>=1?'closed':r.glassA<=0?'open':(r.glass?'closing…':'opening…')},
- {id:'pumps',label:()=>'Coolant pumps',on:r=>r.pumps,c:'#4fd8ff'},
- {id:'od',label:()=>'Coolant overdrive',on:r=>r.od,c:'#b8f0ff',sub:r=>r.pumps?(r.od?'ON · cooling fast':'OFF'):'needs coolant pumps'},
- {id:'main',label:r=>r.main?'Main power down':'Main startup',on:r=>r.main,c:'#5fe39a'},
- {id:'emerg',label:()=>'Emergency shutdown',on:()=>!!S.shutdown,c:'#ff4d4d'},
+ {id:'contain',label:r=>r.contain?t('p.contain.on'):t('p.contain.off'),on:r=>r.contain,c:'#4fd8ff'},
+ {id:'ext',label:r=>r.ext?t('p.ext.on'):t('p.ext.off'),on:r=>r.ext,c:'#ffb547',sub:r=>r.extA>=1?(r.ext?t('p.ext.extended'):t('p.ext.retracted')):(r.ext?t('p.ext.extending'):r.extA>0?t('p.ext.retracting'):t('p.ext.retracted'))},
+ {id:'stab',label:()=>t('p.stab'),on:r=>r.stab,c:()=>laserColors().stab,laser:true},
+ {id:'energy',label:()=>t('p.energy'),on:r=>r.energy,c:()=>laserColors().energy,laser:true},
+ {id:'power',label:()=>t('p.power'),on:r=>r.power,c:()=>laserColors().power,laser:true},
+ {id:'glass',label:r=>r.glass?t('p.glass.on'):t('p.glass.off'),on:r=>r.glass,c:'#9fd3ff',sub:r=>r.glassA>=1?t('p.glass.closed'):r.glassA<=0?t('p.glass.open'):(r.glass?t('p.glass.closing'):t('p.glass.opening'))},
+ {id:'pumps',label:()=>t('p.pumps'),on:r=>r.pumps,c:'#4fd8ff'},
+ {id:'od',label:()=>t('p.od'),on:r=>r.od,c:'#b8f0ff',sub:r=>r.pumps?(r.od?t('p.odOn'):t('common.off')):t('p.odNeeds')},
+ {id:'main',label:r=>r.main?t('p.main.on'):t('p.main.off'),on:r=>r.main,c:'#5fe39a'},
+ {id:'emerg',label:()=>t('p.emerg'),on:()=>!!S.shutdown,c:'#ff4d4d'},
 ];
 function buildPanel(){
   $('#panel').innerHTML=BTNS.map(b=>`<button class="pbtn ${b.id==='emerg'?'emerg':''}" data-act="${b.id}"><span class="lamp"></span><span class="pl"></span><span class="ps"></span></button>`).join('');
@@ -750,13 +838,13 @@ function updatePanel(){
     const on=b.on(r); el.classList.toggle('lit',on);
     const c=typeof b.c==='function'?b.c():b.c; el.style.setProperty('--lampc',c);
     const lbl=b.label(r); const pl=el.querySelector('.pl'); if(pl.textContent!==lbl) pl.textContent=lbl;
-    let sub=b.sub?b.sub(r):(on?'ON':'OFF');
-    if(b.id==='emerg') sub=S.shutdown?`in progress · ${Math.ceil(S.shutdown.t)}s`:'stops everything';
-    if(b.laser && !(r.ext&&r.extA>=1)) sub='laser doors closed';
+    let sub=b.sub?b.sub(r):(on?t('common.on'):t('common.off'));
+    if(b.id==='emerg') sub=S.shutdown?t('p.emergProg',{n:Math.ceil(S.shutdown.t)}):t('p.emergIdle');
+    if(b.laser && !(r.ext&&r.extA>=1)) sub=t('p.doorsClosed');
     const ps=el.querySelector('.ps'); if(ps.textContent!==sub) ps.textContent=sub;
     el.classList.toggle('blocked',!!(S.melt||S.shutdown) && b.id!=='emerg' || (b.laser&&!(r.ext&&r.extA>=1)));
   }
-  const ck=[['Coolant pumps running',r.pumps],['Containment field online',r.contain&&r.contA>=1],['All lasers extended',r.ext&&r.extA>=1],['Stabilization lasers on',r.stab],['Energy lasers on',r.energy],['Power lasers on',r.power],['Glass protection doors closed',r.glass&&r.glassA>=1],['Main startup',r.main]];
+  const ck=[[t('ck.pumps'),r.pumps],[t('ck.contain'),r.contain&&r.contA>=1],[t('ck.ext'),r.ext&&r.extA>=1],[t('ck.stab'),r.stab],[t('ck.energy'),r.energy],[t('ck.power'),r.power],[t('ck.glass'),r.glass&&r.glassA>=1],[t('ck.main'),r.main]];
   $('#checkWrap').hidden=!save.settings.checklist;
   const html=ck.map(([t,ok])=>`<li class="${ok?'ok':''}">${t}</li>`).join('');
   if($('#checklist').innerHTML!==html) $('#checklist').innerHTML=html;
@@ -764,49 +852,49 @@ function updatePanel(){
 $('#panel').addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(b) act(b.dataset.act);});
 function act(id){
   const r=S.r;
-  if(S.melt){ log(id==='emerg'?`Emergency shutdown failed. The ${S.melt.type==='esdp'?'ESDP':S.melt.type} cannot be stopped. Evacuate!`:'Controls are not responding. Evacuate!','err'); return; }
-  if(S.shutdown && id!=='emerg'){ log('Emergency shutdown in progress. Controls are locked.','warn'); return; }
+  if(S.melt){ log(id==='emerg'?t('log.shutFail',{ev:EVENTS[S.melt.type].name}):t('log.noControl'),'err'); return; }
+  if(S.shutdown && id!=='emerg'){ log(t('log.shutLocked'),'warn'); return; }
   switch(id){
     case 'contain':
       r.contain=!r.contain;
-      if(r.contain) log('Containment field starting up.','info');
-      else log(r.main?'Containment field disengaged while the reactor is running!':'Containment field disengaged.',r.main?'err':'info');
+      if(r.contain) log(t('log.contOn'),'info');
+      else log(r.main?t('log.contOffRun'):t('log.contOff'),r.main?'err':'info');
       beep(r.contain?520:300,.15,'sine',.15); break;
     case 'main':
       if(!r.main){ r.main=true;
-        if(!r.contain) log('Main startup without the containment field! The core is unstable!','err');
-        else if(!(r.glass&&r.glassA>=1)) log('Main startup with the glass protection doors open.','warn');
-        else log('Main startup. The reactor is coming online.','good');
+        if(!r.contain) log(t('log.mainNoCont'),'err');
+        else if(!(r.glass&&r.glassA>=1)) log(t('log.mainGlass'),'warn');
+        else log(t('log.mainOk'),'good');
         if(r.contain&&r.contA>=1&&r.ext&&r.extA>=1&&r.stab&&r.energy&&r.power&&r.glass&&r.glassA>=1) unlock('startup');
         beep(220,.4,'sawtooth',.12); beep(330,.4,'sawtooth',.1,.15);
-      } else { r.main=false; log('Main reactor powering down.','info'); beep(330,.4,'sawtooth',.1); beep(200,.5,'sawtooth',.1,.15); }
+      } else { r.main=false; log(t('log.mainDown'),'info'); beep(330,.4,'sawtooth',.1); beep(200,.5,'sawtooth',.1,.15); }
       break;
     case 'glass':
-      r.glass=!r.glass; log(r.glass?'Closing glass protection doors.':'Opening glass protection doors.', (!r.glass&&r.main)?'warn':'info'); beep(260,.25,'triangle',.12); break;
+      r.glass=!r.glass; log(r.glass?t('log.glassClose'):t('log.glassOpen'), (!r.glass&&r.main)?'warn':'info'); beep(260,.25,'triangle',.12); break;
     case 'ext':
-      if(r.ext){ r.energy=r.stab=r.power=false; r.ext=false; log('All lasers off. Retracting lasers and closing laser doors.','info'); }
-      else { r.ext=true; log('Opening laser doors and extending all lasers.','info'); }
+      if(r.ext){ r.energy=r.stab=r.power=false; r.ext=false; log(t('log.extOff'),'info'); }
+      else { r.ext=true; log(t('log.extOn'),'info'); }
       beep(180,.35,'triangle',.12); break;
     case 'energy': case 'stab': case 'power': {
-      const names={energy:'Energy lasers',stab:'Stabilization lasers',power:'Power lasers'};
-      if(!r[id] && !(r.ext&&r.extA>=1)){ log(`${names[id]}: laser doors are closed. Extend all lasers first.`,'err'); return; }
+      const nm=t('ln.'+id);
+      if(!r[id] && !(r.ext&&r.extA>=1)){ log(t('log.laserDoors',{laser:nm}),'err'); return; }
       r[id]=!r[id];
-      if(r[id] && id==='power' && !r.stab) log('Power lasers on without stabilization lasers! Stability dropping!','err');
-      else log(`${names[id]} ${r[id]?'on':'off'}.`, 'info');
+      if(r[id] && id==='power' && !r.stab) log(t('log.powerNoStab'),'err');
+      else log(t(r[id]?'log.laserOn':'log.laserOff',{laser:nm}), 'info');
       beep(r[id]?900:500,.1,'square',.1); break; }
     case 'pumps':
       r.pumps=!r.pumps;
-      if(!r.pumps){ r.od=false; log(r.main?'Coolant pumps stopped while the reactor is running! The core will overheat!':'Coolant pumps stopped.',r.main?'err':'info'); }
-      else log('Coolant pumps running.','info');
+      if(!r.pumps){ r.od=false; log(r.main?t('log.pumpsStopRun'):t('log.pumpsStop'),r.main?'err':'info'); }
+      else log(t('log.pumpsOn'),'info');
       beep(r.pumps?400:200,.25,'triangle',.12); break;
     case 'od':
-      if(!r.pumps){ log('Coolant overdrive needs the coolant pumps running.','err'); return; }
-      r.od=!r.od; log(r.od?'Coolant overdrive on. The core is cooling fast — do not let it freeze.':'Coolant overdrive off.',r.od?'warn':'info');
+      if(!r.pumps){ log(t('log.odNeeds'),'err'); return; }
+      r.od=!r.od; log(r.od?t('log.odOn'):t('log.odOff'),r.od?'warn':'info');
       beep(r.od?1200:600,.2,'sine',.12); break;
     case 'emerg':
       if(S.shutdown) return;
       S.shutdown={t:8}; r.od=false; r.energy=r.stab=r.power=false; r.ext=false; r.main=false; r.glass=true;
-      log('EMERGENCY SHUTDOWN. All lasers off, reactor scramming, glass doors closing.','warn');
+      log(t('log.emerg'),'warn');
       beep(500,.3,'sawtooth',.15); beep(350,.3,'sawtooth',.15,.3); beep(250,.4,'sawtooth',.15,.6); break;
   }
   updatePanel();
@@ -825,9 +913,9 @@ function heliState(){ if(!S.melt||S.melt.type!=='burndown') return null; return 
 function startEvent(type,reason){
   const total=type==='burndown'?HELI_ARRIVE+HELI_STAY:type==='esdp'?120:45+(has('up_shield')?15:0);
   S.melt={type,t:total,total}; S.blocked=type==='esdp'?null:Math.random()<.5?'B':'D'; S.shutdown=null; S.pad=false; S.padGo=0;
-  log(`${EVENTS[type].name}: ${reason}`,'err'); unlock(type);
-  if(S.blocked) log(`Debris has blocked ${SECTIONS[S.blocked].name}. Find another way!`,'err');
-  if(type==='burndown') log('A C.A.M. emergency evacuation helicopter is on its way to the main helipads. It lands in 30 seconds.','warn');
+  log(t('log.event',{ev:EVENTS[type].name,reason}),'err'); unlock(type);
+  if(S.blocked) log(t('log.debris',{place:secName(S.blocked)}),'err');
+  if(type==='burndown') log(t('log.heliComing'),'warn');
   $('#meltBanner').className='melt-banner '+type;
   $('#meltTitle').textContent=EVENTS[type].name;
   eventText(); renderSection();
@@ -838,13 +926,13 @@ function eventText(){
   const m=S.melt; let txt;
   if(m.type==='burndown'){
     txt=heliState()==='coming'
-      ?`Get to the main helipads in the Surface Section! The evacuation helicopter lands in ${Math.ceil(m.t-HELI_STAY)}s. The bunkers will not survive a burndown. ${SECTIONS[S.blocked].name} has collapsed.`
-      :`The evacuation helicopter is on the main helipads! It leaves in ${Math.ceil(m.t)}s — board it now.`;
+      ?t('ev.burnComing',{n:Math.ceil(m.t-HELI_STAY),place:secName(S.blocked)})
+      :t('ev.burnLanded',{n:Math.ceil(m.t)});
   } else if(m.type==='esdp'){
-    txt=`The ESDP core explodes in ${fmtT(Math.ceil(m.t))}. Get to the Surface Section or an emergency bunker!`;
+    txt=t('ev.esdp',{t:fmtT(Math.ceil(m.t))});
   } else {
-    const lost=S.blocked==='B'?'Emergency Bunker Beta':'Emergency Bunker Alpha';
-    txt=`${m.type==='freezedown'?'The core is freezing solid. ':''}Get to the Surface Section or an emergency bunker! ${SECTIONS[S.blocked].name} has collapsed, so ${lost} is cut off — use another route.`;
+    const lost=secName(S.blocked==='B'?'bunkerB':'bunkerA');
+    txt=(m.type==='freezedown'?t('ev.freezePre'):'')+t('ev.escape',{place:secName(S.blocked),bunker:lost});
   }
   const el=$('#meltText'); if(el.textContent!==txt) el.textContent=txt;
 }
@@ -864,15 +952,15 @@ function update(dt){
     if(ty!=='esdp'){ r.stability=approach(r.stability,0,20,dt); r.out=approach(r.out,0,300,dt); }
     const before=heliState();
     S.melt.t-=dt;
-    if(before==='coming'&&heliState()==='landed'){ log('The evacuation helicopter has landed on the main helipads. Two pilots are waiting. It leaves in 30 seconds!','good'); beep(120,.6,'sawtooth',.12); renderSection(); }
-    if(S.padGo>0){ S.padGo-=dt; if(S.padGo<=0){ S.padGo=0; S.pad=true; log('You are at the main helipads.','info'); renderSection(); } }
+    if(before==='coming'&&heliState()==='landed'){ log(t('log.heliLanded'),'good'); beep(120,.6,'sawtooth',.12); renderSection(); }
+    if(S.padGo>0){ S.padGo-=dt; if(S.padGo<=0){ S.padGo=0; S.pad=true; log(t('log.atPad'),'info'); renderSection(); } }
     S.alarm-=dt;
     if(S.alarm<=0){ S.alarm=.9;
       if(ty==='freezedown'){ beep(1500,.3,'sine',.1); beep(1900,.3,'sine',.1,.4); }
       else if(ty==='burndown'){ beep(300,.4,'sawtooth',.12); beep(220,.4,'sawtooth',.12,.45); }
       else if(ty==='esdp'){ S.alarm=1.2; beep(660,.45,'square',.09); beep(440,.45,'square',.09,.55); }
       else { beep(880,.35,'sawtooth',.12); beep(620,.35,'sawtooth',.12,.42); } }
-    if(S.melt.t<=0){ S.melt.t=0; if(ty==='burndown') log('The evacuation helicopter took off without you.','err'); endShift(false); return; }
+    if(S.melt.t<=0){ S.melt.t=0; if(ty==='burndown') log(t('log.heliGone'),'err'); endShift(false); return; }
   } else {
     const cool=has('up_coolant')?8:0;
     let target, stabT;
@@ -888,19 +976,19 @@ function update(dt){
     r.out=approach(r.out,outT,400,dt);
     if(r.main){
       S.surgeIn-=dt;
-      if(S.surgeIn<=0){ S.surgeIn=25+Math.random()*30; r.stability-=ST?10:26; r.temp+=6; log('Plasma surge detected in the core.','warn'); }
-      if(r.stability<=0) startEvent('meltdown','the core lost all stability.');
+      if(S.surgeIn<=0){ S.surgeIn=25+Math.random()*30; r.stability-=ST?10:26; r.temp+=6; log(t('log.surge'),'warn'); }
+      if(r.stability<=0) startEvent('meltdown',t('why.meltdown'));
     }
     if(!S.melt){
-      if(r.temp>=200) startEvent('burndown','the core passed 6,000 °C.');
-      else if(r.temp<=-5.5) startEvent('freezedown','the core fell below −165 °C.');
+      if(r.temp>=200) startEvent('burndown',t('why.burndown'));
+      else if(r.temp<=-5.5) startEvent('freezedown',t('why.freezedown'));
     }
     if(S.melt||S.ended) return;
-    if(r.main&&!r.pumps&&r.temp>100&&!S.hotWarned){ S.hotWarned=true; log('Core overheating! Turn the coolant pumps back on!','err'); }
+    if(r.main&&!r.pumps&&r.temp>100&&!S.hotWarned){ S.hotWarned=true; log(t('log.hot'),'err'); }
     if(r.temp<85) S.hotWarned=false;
-    if(r.temp<4&&!S.coldWarned){ S.coldWarned=true; log('Core is freezing! Turn off coolant overdrive!','err'); }
+    if(r.temp<4&&!S.coldWarned){ S.coldWarned=true; log(t('log.cold'),'err'); }
     if(r.temp>8) S.coldWarned=false;
-    if(S.shutdown){ S.shutdown.t-=dt; if(S.shutdown.t<=0){S.shutdown=null; log('Emergency shutdown complete. The reactor is safe.','good'); unlock('shutdown');} }
+    if(S.shutdown){ S.shutdown.t-=dt; if(S.shutdown.t<=0){S.shutdown=null; log(t('log.shutDone'),'good'); unlock('shutdown');} }
     S.frac+=r.out/2200*.8*dt;
     while(S.frac>=1){S.frac-=1; save.coins++; S.earned++; updateCoins();}
     S.warnBeep-=dt; if(isWarn()&&S.warnBeep<=0){S.warnBeep=1.4; beep(1000,.1,'square',.07);}
@@ -910,11 +998,6 @@ function update(dt){
   if(humGain&&AC){ const g=r.main||S.melt?(.04+r.out/2200*.07+(S.melt?.05:0)):0; humGain.gain.setTargetAtTime(g,AC.currentTime,.3); humOsc.frequency.setTargetAtTime(S.melt?42+Math.random()*10:55+r.out/2200*20,AC.currentTime,.2); }
 }
 function isWarn(){ const r=S.r; return (r.main&&(r.temp>110||r.stability<35))||r.temp<4; }
-const BLAST={
-  meltdown:{far:'The main reactor detonated far below you.',bunk:'The whole facility shook'},
-  freezedown:{far:'The main reactor burst in a freezing blast far below you and covered the facility in ice.',bunk:'A freezing blast turned the facility to ice'},
-  esdp:{far:'The ESDP core detonated far below you and took the whole facility with it.',bunk:'The ESDP core blast tore through the whole facility'},
-};
 function endShift(ok){
   if(S.ended) return; S.ended=true;
   const ev=S.melt?S.melt.type:'meltdown', left=S.melt?S.melt.t:0;
@@ -922,18 +1005,13 @@ function endShift(ok){
   const bonus=ok?(heli?100:bunker?50:75)+Math.floor(left):0;
   save.coins+=bonus; persist();
   if(ok) unlock(heli?'heli':S.loc==='surface'?'surface':S.loc);
-  const fail={
-    meltdown:['Facility lost','The main reactor detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker the moment the alarms start.'],
-    freezedown:['Frozen solid','The main reactor burst in a freezing blast before you reached safety. Next time, run for the Surface Section or an emergency bunker as soon as the frost alarms start.'],
-    esdp:['Self-destructed','The ESDP core detonated before you reached safety. Next time, run for the Surface Section or an emergency bunker right after you activate the ESDP.'],
-    burndown:['Burned down','The evacuation helicopter left the main helipads without you, and the core burned through the facility. Next time, head straight for the helipads in the Surface Section.'],
-  }[ev];
-  const b=BLAST[ev]||BLAST.meltdown;
-  $('#resTitle').textContent=!ok?fail[0]:heli?'You flew out':bunker?'You survived in the bunker':'You escaped';
-  $('#resText').textContent=!ok?fail[1]
-    :heli?`You boarded the C.A.M. emergency evacuation helicopter with ${left.toFixed(1)} seconds to spare. The two pilots lifted off as the core burned through the facility below.`
-    :bunker?`You sealed yourself inside ${SECTIONS[S.loc].name} with ${left.toFixed(1)} seconds to spare. ${b.bunk}, but the bunker held. Rescue teams dug you out the next morning.`
-    :`You reached the Surface Section with ${left.toFixed(1)} seconds to spare. ${b.far}`;
+  const bev=['meltdown','freezedown','esdp'].includes(ev)?ev:'meltdown';
+  const n=left.toLocaleString(locale(),{minimumFractionDigits:1,maximumFractionDigits:1});
+  $('#resTitle').textContent=!ok?t('res.fail.'+ev+'.t'):heli?t('res.flew'):bunker?t('res.bunker'):t('res.escaped');
+  $('#resText').textContent=!ok?t('res.fail.'+ev+'.d')
+    :heli?t('res.heliText',{n})
+    :bunker?t('res.bunkerText',{place:secName(S.loc),n,blast:t('blast.'+bev+'.bunk')})
+    :t('res.surfText',{n,blast:t('blast.'+bev+'.far')});
   $('#resTime').textContent=fmtT(S.time); $('#resEarned').textContent=S.earned; $('#resBonus').textContent=bonus;
   if(humGain) humGain.gain.value=0;
   ok?(beep(523,.15,'triangle',.15),beep(659,.15,'triangle',.15,.15),beep(784,.3,'triangle',.15,.3)):beep(90,1.2,'sawtooth',.2);
@@ -945,27 +1023,28 @@ let hudT=0;
 function hud(){
   const r=S.r;
   const tC=Math.round(r.temp*30);
-  $('#hTemp').textContent=tC.toLocaleString('en-US')+' °C';
+  $('#hTemp').textContent=num(tC)+' °C';
   $('#hStab').textContent=Math.round(r.stability)+'%';
-  $('#hOut').textContent=Math.round(r.out).toLocaleString('en-US')+' MW';
+  $('#hOut').textContent=num(Math.round(r.out))+' MW';
   const warn=isWarn();
-  const st=S.melt?[EVENTS[S.melt.type].name,EVENTS[S.melt.type].cls]:S.shutdown?['EMERGENCY SHUTDOWN','st-shut']:!r.main?['OFFLINE','st-off']:warn?['WARNING','st-warn']:['ONLINE','st-on'];
+  const st=S.melt?[EVENTS[S.melt.type].name,EVENTS[S.melt.type].cls]:S.shutdown?[t('st.shutdown'),'st-shut']:!r.main?[t('st.offline'),'st-off']:warn?[t('st.warning'),'st-warn']:[t('st.online'),'st-on'];
   const p=$('#hStatus'); p.textContent=st[0]; p.className='pill '+st[1];
   $('#meltBanner').hidden=!S.melt;
   if(S.melt){ const hs=heliState();
-    $('#meltCount').textContent=S.melt.type==='esdp'?fmtT(Math.ceil(S.melt.t)):hs==='coming'?`lands in ${(S.melt.t-HELI_STAY).toFixed(1)}s`:hs==='landed'?`leaves in ${S.melt.t.toFixed(1)}s`:S.melt.t.toFixed(1)+'s';
+    $('#meltCount').textContent=S.melt.type==='esdp'?fmtT(Math.ceil(S.melt.t)):hs==='coming'?t('cnt.lands',{n:(S.melt.t-HELI_STAY).toFixed(1)}):hs==='landed'?t('cnt.leaves',{n:S.melt.t.toFixed(1)}):S.melt.t.toFixed(1)+'s';
     eventText(); }
   esdpUI();
-  $('#mCool').textContent=r.pumps?(r.od?'OVERDRIVE':'ON'):'OFF';
-  $('#mMain').textContent=r.main?'ON':'OFF';
-  $('#mCont').textContent=r.contain?Math.round(r.contA*100)+'%':'OFF';
-  $('#mLas').textContent=r.extA>=1?(r.ext?'EXTENDED':'RETRACTED'):r.extA>0?'MOVING':'RETRACTED';
-  $('#mGlass').textContent=r.glassA>=1?'CLOSED':r.glassA<=0?'OPEN':'MOVING';
+  const ON=t('common.on'), OFF=t('common.off');
+  $('#mCool').textContent=r.pumps?(r.od?t('ro.overdrive'):ON):OFF;
+  $('#mMain').textContent=r.main?ON:OFF;
+  $('#mCont').textContent=r.contain?Math.round(r.contA*100)+'%':OFF;
+  $('#mLas').textContent=r.extA>=1?(r.ext?t('ro.extended'):t('ro.retracted')):r.extA>0?t('ro.moving'):t('ro.retracted');
+  $('#mGlass').textContent=r.glassA>=1?t('ro.closed'):r.glassA<=0?t('ro.open'):t('ro.moving');
   if(S.loc==='main'&&!S.travel){
-    $('#gTemp').textContent=tC.toLocaleString('en-US')+' °C';
+    $('#gTemp').textContent=num(tC)+' °C';
     $('#gStab').textContent=Math.round(r.stability)+'%';
     $('#gCont').textContent=Math.round(r.contA*100)+'%';
-    $('#gOut').textContent=Math.round(r.out).toLocaleString('en-US')+' MW';
+    $('#gOut').textContent=num(Math.round(r.out))+' MW';
     const bar=(id,v,c)=>{const e=$(id);e.style.width=clamp(v,0,100)+'%';e.style.background=c;};
     bar('#gbTemp',(r.temp+10)/210*100,r.temp<4?'#b8f0ff':r.temp>110?'var(--red)':r.temp>85?'var(--amber)':'var(--cyan)');
     bar('#gbStab',r.stability,r.stability<35?'var(--red)':r.stability<60?'var(--amber)':'var(--green)');
@@ -1091,7 +1170,7 @@ function boom(){
 }
 function startAftermath(){
   const ev=S.melt?S.melt.type:'meltdown', heli=ev==='burndown', surf=!heli&&S.loc==='surface';
-  AF={kind:heli?'heli':surf?'surface':'bunker',cold:ev==='freezedown',lift:0,bunker:surf?null:SECTIONS[S.loc].name,t:0,phase:surf?'walk':'pick',uiPhase:null,
+  AF={kind:heli?'heli':surf?'surface':'bunker',cold:ev==='freezedown',lift:0,bunker:surf?null:secName(S.loc),t:0,phase:surf?'walk':'pick',uiPhase:null,
       fade:0,endT:0,shake:surf?1:0,parts:[],smoke:[],hold:null,stepT:0,
       px:heli?60:60,walkCycle:0,gate:0,
       stars:Array.from({length:60},()=>({x:Math.random()*720,y:Math.random()*100,s:Math.random()*1.5+.3})),
@@ -1103,8 +1182,8 @@ function startAftermath(){
   }
   if(heli){ AF.kind='heli'; AF.bunker=null; AF.phase='walk'; AF.shake=1; }
   const evName={meltdown:'Meltdown',freezedown:'Freezedown',burndown:'Burndown',esdp:'ESDP'}[ev];
-  $('#afTitle').textContent=heli?'The main helipads':surf?'The main road':`Rescue at ${AF.bunker}`;
-  $('#afEyebrow').textContent=heli?'Aftermath · Burndown evacuation':surf?`Aftermath · ${evName} surface escape`:`Aftermath · ${evName} · C.A.M. Emergency Rescue Corps`;
+  $('#afTitle').textContent=heli?t('af.title.heli'):surf?t('af.title.road'):t('af.title.rescue',{place:AF.bunker});
+  $('#afEyebrow').textContent=heli?t('af.eb.heli'):surf?t('af.eb.surf',{ev:evName}):t('af.eb.bunk',{ev:evName});
   show('aftermath'); afUI();
   if(surf||heli) boom();
 }
@@ -1114,18 +1193,18 @@ function afUI(){
   if(!AF||AF.uiPhase===AF.phase) return; AF.uiPhase=AF.phase;
   const p=AF.phase, pick=p==='pick';
   $('#crewPick').hidden=!pick; $('#afStage').hidden=pick;
-  if(pick) $('#crewGrid').innerHTML=CREW.map(c=>`<button class="crew" data-crew="${c.id}"><span class="helm" style="background:${c.helmet}"></span><h4>${c.name}</h4><p>${c.role}</p>
-    <span class="stat">Digging<i><b style="width:${c.dig/1.7*100}%"></b></i></span><span class="stat">Doors<i><b style="width:${c.open/1.7*100}%"></b></i></span></button>`).join('');
+  if(pick) $('#crewGrid').innerHTML=CREW.map(c=>`<button class="crew" data-crew="${c.id}"><span class="helm" style="background:${c.helmet}"></span><h4>${c.name}</h4><p>${t('crew.'+c.id+'.role')}</p>
+    <span class="stat">${t('crew.dig')}<i><b style="width:${c.dig/1.7*100}%"></b></i></span><span class="stat">${t('crew.doors')}<i><b style="width:${c.open/1.7*100}%"></b></i></span></button>`).join('');
   const hints={
-    walk:AF.kind==='heli'?'The core is burning through the facility. Hold Walk (or the → key) to run to the evacuation helicopter.':'The reactor is gone. Hold Walk (or the → key) to follow the main road to the main gates.',
-    liftoff:'You are aboard. The two pilots lift off from the main helipads…',
-    pick:`The C.A.M. Emergency Rescue Corps has arrived above ${AF.bunker}. Pick the crew worker you want to play as.`,
-    dig:'Tap Dig (or press Space) to clear the rubble down to the bunker doors.',
-    walkdoor:'The bunker doors are clear. Walking over to the door wheel…',
-    door:'Hold Open doors (or Space) to turn the door wheel.',
-    opening:'The blast door is opening…', rescue:'The operator is alive!', fade:''};
+    walk:AF.kind==='heli'?t('af.h.walkHeli'):t('af.h.walk'),
+    liftoff:t('af.h.liftoff'),
+    pick:t('af.h.pick',{place:AF.bunker}),
+    dig:t('af.h.dig'),
+    walkdoor:t('af.h.walkdoor'),
+    door:t('af.h.door'),
+    opening:t('af.h.opening'), rescue:t('af.h.rescue'), fade:''};
   $('#afHint').textContent=hints[p]??'';
-  const btn={walk:['walk','Walk ▶'],dig:['dig','Dig'],door:['open','Open doors']}[p];
+  const btn={walk:['walk',t('af.b.walk')],dig:['dig',t('af.b.dig')],door:['open',t('af.b.open')]}[p];
   $('#afControls').innerHTML=btn?`<button class="hold" id="afHold" data-hold="${btn[0]}">${btn[1]}</button>`:'';
 }
 $('#crewGrid').addEventListener('click',e=>{const b=e.target.closest('[data-crew]'); if(!b||!AF) return; AF.crew=CREW.find(c=>c.id===b.dataset.crew); AF.phase='dig'; afUI();});
@@ -1271,7 +1350,7 @@ function drawSurfaceAf(){
   for(const p of a.parts){ c.fillStyle=p.c; c.fillRect(p.x-cam*0,p.y,p.s,p.s); }
   if(a.t<1){ c.fillStyle=cold?`rgba(220,245,255,${1-a.t})`:`rgba(255,240,220,${1-a.t})`; c.fillRect(-20,-20,760,480); }
   c.setTransform(1,0,0,1,0,0);
-  fadeOverlay('You walked out through the main gates.',cold?'The C.A.M. facility is frozen solid, but you made it.':'The C.A.M. facility is gone, but you made it.');
+  fadeOverlay(t('af.f.gates'),cold?t('af.f.frozen'):t('af.f.gone'));
 }
 function drawBunkerAf(){
   const a=AF, c=ag; const sx=(Math.random()-.5)*a.shake*12;
@@ -1328,7 +1407,7 @@ function drawBunkerAf(){
   c.fillStyle='#f2f2f2'; c.fillRect(470,88,140,5);
   c.fillStyle='#1b1b1b'; [498,580,636].forEach(x=>{c.beginPath();c.arc(x,108,9,0,Math.PI*2);c.fill();});
   const fl=Math.floor(a.t*4)%2; c.fillStyle=fl?'#ff3b3b':'#3b8bff'; c.fillRect(520,60,40,6);
-  c.fillStyle='#1b1b1b'; c.font='700 11px "Chakra Petch", sans-serif'; c.fillText('C.A.M. EMERGENCY RESCUE',474,82);
+  c.fillStyle='#1b1b1b'; c.font='700 11px "Chakra Petch", "Exo 2", sans-serif'; c.fillText('C.A.M. EMERGENCY RESCUE',474,82);
   // other crew on the surface
   drawPerson(430,GROUND_Y-12,{walk:0,body:'#d9731c',stripe:'#f2f2f2',helmet:'#f2f2f2'});
   drawPerson(200,GROUND_Y-12,{walk:0,body:'#d9731c',stripe:'#f2f2f2',helmet:'#ffd23f',reach:true});
@@ -1340,16 +1419,16 @@ function drawBunkerAf(){
   }
   // survivor
   if(a.doorUp>.6) drawPerson(a.sx,FLOOR_Y,{walk:a.phase==='rescue'&&a.sx>384.5?a.t:0,body:'#e9eef2',stripe:'#4fd8ff'});
-  if(a.phase==='rescue'&&a.sx<=384.5){ c.fillStyle='#fff'; c.font='600 14px "IBM Plex Sans", sans-serif'; c.fillText('Operator found alive!',300,240); }
+  if(a.phase==='rescue'&&a.sx<=384.5){ c.fillStyle='#fff'; c.font='600 14px "IBM Plex Sans", sans-serif'; c.fillText(t('af.found'),300,240); }
   for(const p of a.parts){ c.fillStyle=p.c; c.fillRect(p.x,p.y,p.s,p.s); }
   // dig progress
   if(a.phase==='dig'){ const done=a.layers.reduce((s,l)=>s+(l.max-l.hp),0)/(a.layers.length*3);
     c.fillStyle='rgba(0,0,0,.5)'; c.fillRect(14,410,180,16); c.fillStyle='#ffb547'; c.fillRect(16,412,176*done,12);
-    c.fillStyle='#fff'; c.font='600 11px "IBM Plex Mono", monospace'; c.fillText('RUBBLE CLEARED',200,422); }
+    c.fillStyle='#fff'; c.font='600 11px "IBM Plex Mono", monospace'; c.fillText(t('af.rubble'),200,422); }
   if(a.phase==='door'){ c.fillStyle='rgba(0,0,0,.5)'; c.fillRect(14,410,180,16); c.fillStyle='#4fd8ff'; c.fillRect(16,412,176*a.wheel,12);
-    c.fillStyle='#fff'; c.font='600 11px "IBM Plex Mono", monospace'; c.fillText('DOOR WHEEL',200,422); }
+    c.fillStyle='#fff'; c.font='600 11px "IBM Plex Mono", monospace'; c.fillText(t('af.wheel'),200,422); }
   c.setTransform(1,0,0,1,0,0);
-  fadeOverlay('Rescue complete.',`The survivor of ${a.bunker} is safe with the rescue crew.`);
+  fadeOverlay(t('af.f.rescue'),t('af.f.rescueSub',{place:a.bunker}));
 }
 function drawHeliAf(){
   const a=AF, c=ag; const sx=(Math.random()-.5)*a.shake*10;
@@ -1364,7 +1443,7 @@ function drawHeliAf(){
   c.fillStyle='#1d1a17'; c.fillRect(-20,350,760,100);
   [[480,'1'],[660,'2']].forEach(([x,n])=>{ c.fillStyle='#3a3a3d'; c.beginPath(); c.ellipse(x,372,90,16,0,0,Math.PI*2); c.fill();
     c.strokeStyle='#e8e2c8'; c.lineWidth=2; c.beginPath(); c.ellipse(x,372,70,12,0,0,Math.PI*2); c.stroke();
-    c.fillStyle='#e8e2c8'; c.font='700 16px "Chakra Petch", sans-serif'; c.textAlign='center'; c.fillText('H'+n,x,378); c.textAlign='left';
+    c.fillStyle='#e8e2c8'; c.font='700 16px "Chakra Petch", "Exo 2", sans-serif'; c.textAlign='center'; c.fillText('H'+n,x,378); c.textAlign='left';
     for(let i=0;i<6;i++){ c.fillStyle=Math.floor(a.t*3+i)%2?'#5fe39a':'#1f3a2b'; c.beginPath(); c.arc(x-80+i*32,388,3,0,Math.PI*2); c.fill(); } });
   c.fillStyle='#d9d3c0'; c.font='600 11px "IBM Plex Mono", monospace'; c.fillText('C.A.M. MAIN HELIPADS',520,420);
   // helicopter
@@ -1379,7 +1458,7 @@ function drawHeliAf(){
   c.fillStyle='#9fd3ff'; c.beginPath(); c.ellipse(36,-5,22,13,0,0,Math.PI*2); c.fill();
   c.fillStyle='#e8c3a0'; c.beginPath(); c.arc(28,-7,4.5,0,Math.PI*2); c.arc(44,-7,4.5,0,Math.PI*2); c.fill();
   c.fillStyle='#2b3440'; c.beginPath(); c.arc(28,-9,4.8,Math.PI,0); c.arc(44,-9,4.8,Math.PI,0); c.fill();
-  c.fillStyle='#1b1b1b'; c.font='700 10px "Chakra Petch", sans-serif'; c.fillText('C.A.M. EVAC',-44,-2);
+  c.fillStyle='#1b1b1b'; c.font='700 10px "Chakra Petch", "Exo 2", sans-serif'; c.fillText('C.A.M. EVAC',-44,-2);
   c.fillStyle='#3a3d42'; c.fillRect(-4,-30,8,10);
   const rw=150*Math.abs(Math.cos(a.t*28)); c.fillStyle='rgba(60,60,64,.85)'; c.fillRect(-rw/2,-33,rw,3);
   c.restore();
@@ -1388,14 +1467,14 @@ function drawHeliAf(){
   for(const p of a.parts){ c.fillStyle=p.c; c.fillRect(p.x,p.y,p.s,p.s); }
   if(a.t<1){ c.fillStyle=`rgba(255,245,220,${1-a.t})`; c.fillRect(-20,-20,760,480); }
   c.setTransform(1,0,0,1,0,0);
-  fadeOverlay('The helicopter carried you away.','Below you, the core burned through the C.A.M. facility.');
+  fadeOverlay(t('af.f.heli'),t('af.f.heliSub'));
 }
 
 function fadeOverlay(title,sub){
   const a=AF; if(a.phase!=='fade') return;
   ag.fillStyle=`rgba(0,0,0,${a.fade})`; ag.fillRect(0,0,720,440);
   if(a.fade>=1){ const al=Math.min(1,a.endT/.8); ag.globalAlpha=al; ag.textAlign='center';
-    ag.fillStyle='#e9eef2'; ag.font='700 30px "Chakra Petch", sans-serif'; ag.fillText(title,360,210);
+    ag.fillStyle='#e9eef2'; ag.font='700 30px "Chakra Petch", "Exo 2", sans-serif'; ag.fillText(title,360,210);
     ag.fillStyle='#9aabb6'; ag.font='400 15px "IBM Plex Sans", sans-serif'; ag.fillText(sub,360,242);
     ag.textAlign='left'; ag.globalAlpha=1; }
 }
@@ -1421,7 +1500,7 @@ function frame(now){
   }
   requestAnimationFrame(frame);
 }
-updateCoins(); show('menu'); requestAnimationFrame(frame);
+applyI18n(); show('menu'); requestAnimationFrame(frame);
 })();
 </script>
 
